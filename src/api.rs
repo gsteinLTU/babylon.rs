@@ -32,29 +32,36 @@ extern "C" {
     pub fn new(engine: &Engine) -> Scene;
 
     #[wasm_bindgen(method)]
-    pub fn createDefaultEnvironment(this: &Scene, options: Option<IEnvironmentHelperOptions>);
+    pub fn createDefaultEnvironment(this: &Scene);
 
     #[wasm_bindgen(method)]
     pub fn render(this: &Scene, updateCameras: Option<bool>, ignoreAnimations: Option<bool>);
 }
 
 #[wasm_bindgen]
-pub struct IEnvironmentHelperOptions {
-    createGround: Option<bool>,
-    createSkybox: Option<bool>
+extern "C" {
+    pub type Mesh;
+    
+    #[wasm_bindgen(method)]
+    pub fn dispose(this: &Mesh, doNotRecurse: Option<bool>, disposeMaterialAndTextures: Option<bool>);
+
+    #[wasm_bindgen(method, getter)]
+    pub fn position(this: &Mesh) -> Vector3;
+
+    #[wasm_bindgen(method, setter)]
+    pub fn set_position(this: &Mesh, newPosition: Vector3);
 }
+
 
 pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
     let window = web_sys::window().expect("should have a window in this context");
     let document = window.document().expect("window should have a document");
     let canvas = document.query_selector(selector).expect("Selector not found").expect("Selector not found");
     
-    let scene = create_scene(selector);
-    scene.borrow().createDefaultEnvironment(Some(IEnvironmentHelperOptions {
-        createGround: Some(false),
-        createSkybox: Some(false),
-    }));
-
+    let engine = Rc::new(RefCell::new(Engine::new(&canvas, true))); 
+    
+    let scene = Rc::new(RefCell::new(Scene::new(&engine.borrow())));
+    
     // Add a camera to the scene and attach it to the canvas
     let camera = ArcRotateCamera::new(
         "Camera",
@@ -63,9 +70,9 @@ pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
         2.0,
         Vector3::Zero(),
         Some(&scene.borrow()),
-        None
+        Some(true)
     );
-    camera.attachControl(&canvas, true);
+    camera.attachControl(canvas, true);
 
     // Add lights to the scene
     HemisphericLight::new(
@@ -78,18 +85,6 @@ pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
         Vector3::new(0.0, 1.0, -1.0),
         &scene.borrow()
     );
-
-    scene
-}
-
-pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
-    let window = web_sys::window().expect("should have a window in this context");
-    let document = window.document().expect("window should have a document");
-    let canvas = document.query_selector(selector).expect("Selector not found").expect("Selector not found");
-
-    let engine = Rc::new(RefCell::new(Engine::new(&canvas, true))); 
-    
-    let scene = Rc::new(RefCell::new(Scene::new(&engine.borrow())));
 
     let closure_scene = scene.clone();
     let renderloop_closure = Closure::<dyn FnMut()>::new(move || {
@@ -107,14 +102,22 @@ pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
     scene
 }
 
+pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
+    let window = web_sys::window().expect("should have a window in this context");
+    let document = window.document().expect("window should have a document");
+    let canvas = document.query_selector(selector).expect("Selector not found").expect("Selector not found");
+
+    let engine = Rc::new(RefCell::new(Engine::new(&canvas, true))); 
+    
+    let scene = Rc::new(RefCell::new(Scene::new(&engine.borrow())));
+    scene
+}
+
 /*
 impl Default for BabylonApi {
     fn default() -> Self {
         BabylonApi {
  
-            ),
-
-            ),
             fn_create_sphere: jsfn!(
                 r#"
                 Function(scene,size){

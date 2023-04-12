@@ -2,7 +2,6 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::prelude::*;
 
-
 #[wasm_bindgen]
 extern "C" {    
     pub type HemisphericLight;

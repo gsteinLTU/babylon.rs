@@ -9,5 +9,5 @@ extern "C" {
     pub fn new(name: &str, alpha: f64, beta: f64, radius: f64, target: Vector3, scene: Option<&Scene>, setActiveOnSceneIfNoneActive: Option<bool>) -> ArcRotateCamera;
 
     #[wasm_bindgen(method)]
-    pub fn attachControl(this: &ArcRotateCamera, canvas: &Element, noPreventDefault: bool);
+    pub fn attachControl(this: &ArcRotateCamera, canvas: Element, noPreventDefault: bool);
 }

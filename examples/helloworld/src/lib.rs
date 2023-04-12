@@ -1,3 +1,6 @@
+use std::mem;
+
+use js_sys::Math;
 use wasm_bindgen::prelude::*;
 use babylon::prelude::*;
 use web_sys::console;
@@ -26,7 +29,7 @@ impl Game {
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    babylon::api::create_basic_scene("#renderCanvas");
+    let scene = babylon::api::create_basic_scene("#renderCanvas");
     
     console::log_1(&"Started".into());
 
@@ -41,4 +44,14 @@ pub fn main() {
         ));
         game.shape.push(sphere);
     }*/
+
+    for i in 0..10 { 
+        let mut sphere = Sphere::new(&scene.borrow(), format!("sphere_{}", i).as_str(), SphereOptions{ diameter: Some(Math::random() + 0.5), ..Default::default() });
+        sphere.set_position(Vector3::new(
+            Math::random() - 0.5,
+            Math::random() - 0.5,
+            Math::random() - 0.5,
+        ));        
+        mem::forget(sphere);
+    }
 }
