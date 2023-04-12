@@ -1,27 +1,18 @@
-use crate::api::BabylonApi;
-use crate::core::Scene;
-use web::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
-pub struct HemisphericLight {
-    _js_ref: ExternRef,
+use crate::prelude::*;
+
+
+#[wasm_bindgen]
+extern "C" {    
+    pub type HemisphericLight;
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(name: &str, direction: Vector3, scene: &Scene) -> HemisphericLight;
 }
 
-impl HemisphericLight {
-    pub fn new(scene: &Scene) -> HemisphericLight {
-        HemisphericLight {
-            _js_ref: BabylonApi::create_hemispheric_light(&scene.get_js_ref()),
-        }
-    }
-}
-
-pub struct PointLight {
-    _js_ref: ExternRef,
-}
-
-impl PointLight {
-    pub fn new(scene: &Scene) -> PointLight {
-        PointLight {
-            _js_ref: BabylonApi::create_point_light(&scene.get_js_ref()),
-        }
-    }
+#[wasm_bindgen]
+extern "C" {    
+    pub type PointLight;
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(name: &str, position: Vector3, scene: &Scene) -> PointLight;
 }

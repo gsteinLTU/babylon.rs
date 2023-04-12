@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 extern crate alloc;
-mod api;
+pub mod api;
 pub mod basic_game;
 pub mod cameras;
 pub mod constants;

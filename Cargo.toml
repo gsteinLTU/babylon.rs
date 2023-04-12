@@ -13,5 +13,13 @@ readme="README.md"
 lazy_static = "1.4.0"
 globals = "1.0.1"
 nalgebra = "0.32.2"
-web = "0.2.12"
-js = "0.5.7"
+wasm-bindgen = "0.2.84"
+js-sys = "0.3.61"
+web-sys = {version = "0.3.61", features = [
+  'Document',
+  'Element',
+  'HtmlElement',
+  'Node',
+  'Window',
+  "console"
+]}

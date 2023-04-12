@@ -4,4 +4,4 @@ build:
 lint:
 	@cargo fmt
 serve:build
-	python3 -m http.server 8080
+	basic-http-server

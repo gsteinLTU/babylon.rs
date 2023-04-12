@@ -1,15 +1,13 @@
-use crate::api::BabylonApi;
-use crate::core::Scene;
-use web::*;
+use wasm_bindgen::prelude::wasm_bindgen;
+use web_sys::Element;
+use crate::prelude::*;
 
-pub struct Camera {
-    _js_ref: ExternRef,
-}
+#[wasm_bindgen]
+extern "C" {    
+    pub type ArcRotateCamera;
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(name: &str, alpha: f64, beta: f64, radius: f64, target: Vector3, scene: Option<&Scene>, setActiveOnSceneIfNoneActive: Option<bool>) -> ArcRotateCamera;
 
-impl Camera {
-    pub fn new(scene: &Scene) -> Camera {
-        Camera {
-            _js_ref: BabylonApi::create_arc_rotate_camera(&scene.get_js_ref()),
-        }
-    }
+    #[wasm_bindgen(method)]
+    pub fn attachControl(this: &ArcRotateCamera, canvas: &Element, noPreventDefault: bool);
 }

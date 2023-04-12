@@ -1,7 +1,7 @@
+/* 
 use crate::api::BabylonApi;
 use crate::math::*;
 use web::*;
-
 pub struct Scene {
     ambient_color: Color,
     clear_color: Color,
@@ -58,4 +58,4 @@ impl Scene {
         self.clear_color = c;
         BabylonApi::set_clear_color(self.get_js_ref(), c.x, c.y, c.z);
     }
-}
+}*/
