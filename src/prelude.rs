@@ -6,4 +6,5 @@ pub use crate::core::*;
 pub use crate::lights::*;
 pub use crate::materials::*;
 pub use crate::math::*;
+pub use crate::mesh::*;
 pub use crate::shapes::*;

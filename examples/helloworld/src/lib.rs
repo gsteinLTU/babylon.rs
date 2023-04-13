@@ -46,7 +46,7 @@ pub fn main() {
     }*/
 
     for i in 0..10 { 
-        let mut sphere = Sphere::new(&scene.borrow(), format!("sphere_{}", i).as_str(), SphereOptions{ diameter: Some(Math::random() + 0.5), ..Default::default() });
+        let sphere = BabylonMesh::create_sphere(&scene.borrow(), format!("sphere_{}", i).as_str(), SphereOptions{ diameter: Some(Math::random() + 0.5), ..Default::default() });
         sphere.set_position(Vector3::new(
             Math::random() - 0.5,
             Math::random() - 0.5,

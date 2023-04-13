@@ -10,5 +10,6 @@ pub mod js;
 pub mod lights;
 pub mod materials;
 pub mod math;
+pub mod mesh;
 pub mod prelude;
 pub mod shapes;

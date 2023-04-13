@@ -7,18 +7,40 @@
 //     fn get_js_ref(&self) -> &ExternRef;
 // }
 
-use wasm_bindgen::prelude::wasm_bindgen;
+use js_sys::Reflect;
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 use crate::prelude::*;
 
-
 #[wasm_bindgen]
 extern "C" {
+    #[wasm_bindgen(js_namespace = BABYLON)]
+    pub type Material;
+    
+    #[wasm_bindgen(extends = Material, js_namespace = BABYLON)]
     pub type StandardMaterial;
+
     #[wasm_bindgen(constructor, js_namespace = BABYLON)]
-    pub fn new(scene: &Scene) -> StandardMaterial;
+    pub fn new(name: &str, scene: &Scene) -> StandardMaterial;
 }
 
+impl StandardMaterial {
+    pub fn get_diffuse_color(&self) -> Color3 {
+        Reflect::get(&self, &JsValue::from_str("diffuseColor")).expect("diffuseColor not found in StandardMaterial").into()
+    }
+
+    pub fn set_diffuse_color(&self, c: Color3) {
+        Reflect::set(&self, &JsValue::from_str("diffuseColor"), &c).expect("diffuseColor not found in StandardMaterial");
+    }
+
+    pub fn get_alpha(&self) -> f64 {
+        Reflect::get(&self, &JsValue::from_str("alpha")).expect("alpha not found in StandardMaterial").as_f64().unwrap()
+    }
+
+    pub fn set_alpha(&self, alpha: f64) {
+        Reflect::set(&self, &JsValue::from_str("alpha"), &JsValue::from_f64(alpha)).expect("alpha not found in StandardMaterial");
+    }
+}
 // pub struct StandardMaterial {
 //     js_ref: ExternRef,
 //     diffuse_color: Color,
@@ -38,11 +60,6 @@ extern "C" {
 //             ambient_color: Color::new(0.0, 0.0, 0.0),
 //             alpha: 1.0,
 //         }
-//     }
-
-//     pub fn set_diffuse_color(&mut self, c: Color) {
-//         self.diffuse_color = c;
-//         BabylonApi::set_diffuse_color(self.get_js_ref(), c.x, c.y, c.z);
 //     }
 
 //     pub fn set_emmisive_color(&mut self, c: Color) {

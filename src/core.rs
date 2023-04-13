@@ -1,4 +1,35 @@
-/* 
+use js_sys::Function;
+use wasm_bindgen::prelude::wasm_bindgen;
+use web_sys::Element;
+
+#[wasm_bindgen]
+extern "C" {
+    pub type Engine;
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(canvas: &Element, b: bool) -> Engine;
+
+    #[wasm_bindgen(method)]
+    pub fn resize(this: &Engine, forceSetSize: Option<bool>);
+
+    #[wasm_bindgen(method)]
+    pub fn runRenderLoop(this: &Engine, renderFunction: &Function);
+}
+
+#[wasm_bindgen]
+extern "C" {
+    pub type Scene;
+
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(engine: &Engine) -> Scene;
+
+    #[wasm_bindgen(method)]
+    pub fn createDefaultEnvironment(this: &Scene);
+
+    #[wasm_bindgen(method)]
+    pub fn render(this: &Scene, updateCameras: Option<bool>, ignoreAnimations: Option<bool>);
+}
+
+/*
 use crate::api::BabylonApi;
 use crate::math::*;
 use web::*;
