@@ -1,12 +1,7 @@
-// use crate::api::BabylonApi;
-// use crate::core::*;
-// use crate::materials::*;
-// use crate::math::*;
-// use web::*;
+use js_sys::{Promise, Reflect, Array};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue, JsCast};
 
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
-
-use crate::prelude::{BabylonMesh, Color4, Mesh, Scene, Vector3, Vector4};
+use crate::prelude::{BabylonMesh, Mesh, Scene};
 
 #[wasm_bindgen]
 extern "C" {
@@ -47,6 +42,14 @@ pub struct BoxOptions {
     pub wrap: Option<bool>,
 }
 
+#[wasm_bindgen]
+extern "C" {
+    pub(crate) type SceneLoader;
+
+    #[wasm_bindgen(static_method_of = SceneLoader, js_namespace = BABYLON)]
+    pub(crate) fn ImportMeshAsync(meshNames: Option<&str>, rootUrl: &str, sceneFilename: &str, scene: Option<&Scene>) -> Promise;
+}
+
 impl BabylonMesh {
     pub fn create_sphere(scene: &Scene, name: &str, options: SphereOptions) -> BabylonMesh {
         BabylonMesh {
@@ -59,68 +62,24 @@ impl BabylonMesh {
             mesh: MeshBuilder::CreateBox(name, options, scene),
         }
     }
+
+    pub async fn create_gltf(scene: &Scene, name: &str, file: &str) -> BabylonMesh {
+        let dummy = Mesh::new(name, scene.into());
+        let promise = SceneLoader::ImportMeshAsync(None, "", file, scene.into());
+        let import = wasm_bindgen_futures::JsFuture::from(promise);
+
+        let import_result = import.await.expect("Error reading GLTF file");
+
+        let imported_meshes = &Reflect::get(&import_result, &JsValue::from_str("meshes")).expect("Error reading GLTF file");
+        let imported_meshes_array = imported_meshes.unchecked_ref::<Array>();
+
+        for val in imported_meshes_array.iter() { 
+            let mesh: &Mesh = val.unchecked_ref::<Mesh>();
+            mesh.set_parent(&dummy);
+        }
+
+        BabylonMesh {
+            mesh: dummy,
+        }
+    }
 }
-
-// pub struct GLTF {
-//     position: Vector3<f64>,
-//     js_ref: ExternRef,
-// }
-
-// impl GLTF {
-//     pub fn new(scene: &Scene, file: &str) -> GLTF {
-//         GLTF {
-//             position: Vector3::new(0.0, 0.0, 0.0),
-//             js_ref: BabylonApi::create_gltf(scene.get_js_ref(), file),
-//         }
-//     }
-
-//     pub fn get_position(&self) -> &Vector {
-//         &self.position
-//     }
-
-//     pub fn set_position(&mut self, p: Vector) {
-//         self.position = p;
-//         BabylonApi::set_position(&mut self.js_ref, p.x, p.y, p.z);
-//     }
-
-//     pub fn set_position_x(&mut self, v: f64) {
-//         self.position.x = v;
-//         BabylonApi::set_position(
-//             &mut self.js_ref,
-//             self.position.x,
-//             self.position.y,
-//             self.position.z,
-//         );
-//     }
-
-//     pub fn set_position_y(&mut self, v: f64) {
-//         self.position.y = v;
-//         BabylonApi::set_position(
-//             &mut self.js_ref,
-//             self.position.x,
-//             self.position.y,
-//             self.position.z,
-//         );
-//     }
-
-//     pub fn set_position_z(&mut self, v: f64) {
-//         self.position.z = v;
-//         BabylonApi::set_position(
-//             &mut self.js_ref,
-//             self.position.x,
-//             self.position.y,
-//             self.position.z,
-//         );
-//     }
-
-//     pub fn set_scaling(&mut self, p: Vector) {
-//         self.position = p;
-//         BabylonApi::set_scaling(&mut self.js_ref, p.x, p.y, p.z);
-//     }
-// }
-
-// impl Drop for GLTF {
-//     fn drop(&mut self) {
-//         BabylonApi::dispose_mesh(&mut self.js_ref);
-//     }
-// }

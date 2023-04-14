@@ -1,6 +1,5 @@
 use std::{cell::RefCell, f64::consts::PI, mem, rc::Rc};
 
-use js_sys::Function;
 use wasm_bindgen::{
     prelude::{wasm_bindgen, Closure},
     JsCast,
@@ -78,31 +77,10 @@ impl Default for BabylonApi {
     fn default() -> Self {
         BabylonApi {
 
-            fn_create_standard_material: jsfn!(
-                r#"
-                Function(scene){
-                    return new BABYLON.StandardMaterial(null, scene);
-                }
-            "#
-            ),
-            fn_set_material: jsfn!(
-                r#"
-                Function(mesh,mat){
-                    mesh.material = mat;
-                }
-            "#
-            ),
             fn_set_emmisive_color: jsfn!(
                 r#"
                 Function(mat,r,g,b){
                     mat.emissiveColor = new BABYLON.Color3(r, g, b);
-                }
-            "#
-            ),
-            fn_set_diffuse_color: jsfn!(
-                r#"
-                Function(mat,r,g,b){
-                    mat.diffuseColor = new BABYLON.Color3(r, g, b);
                 }
             "#
             ),
@@ -124,13 +102,6 @@ impl Default for BabylonApi {
                 r#"
                 Function(scene,r,g,b){
                     scene.clearColor = new BABYLON.Color3(r, g, b);
-                }
-            "#
-            ),
-            fn_set_alpha: jsfn!(
-                r#"
-                Function(mat,a){
-                    mat.alpha = a;
                 }
             "#
             ),
@@ -158,20 +129,6 @@ impl Default for BabylonApi {
                     return scene.getEngine().getDeltaTime();
                 }
             "#
-            ),
-            fn_create_gltf: jsfn!(
-                r#"
-                Function(scene,file){
-                    var dummy = new BABYLON.Mesh(null, scene);
-                    BABYLON.SceneLoader.ImportMesh(null, "", file, scene, Function (newMeshes, particleSystems, skeletons) {
-                        for(let v in newMeshes){
-                            var dude = newMeshes[v];
-                            dude.parent = dummy;
-                        }
-                    });
-                    return dummy;
-                }
-                "#
             ),
         }
     }

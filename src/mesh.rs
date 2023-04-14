@@ -1,10 +1,13 @@
 use crate::prelude::*;
 use js_sys::Reflect;
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue, JsCast};
 
 #[wasm_bindgen]
 extern "C" {
     pub(crate) type Mesh;
+
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub(crate) fn new(name: &str, scene: Option<&Scene>) -> Mesh;
 
     #[wasm_bindgen(method)]
     pub(crate) fn dispose(
@@ -31,19 +34,25 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub(crate) fn set_rotationQuaternion(this: &Mesh, quaternion: Option<Quaternion>);
 
-    #[wasm_bindgen(method, getter)]
-    pub(crate) fn scaling(this: &Mesh) -> Vector3;
-
-    #[wasm_bindgen(method, setter)]
-    pub(crate) fn set_scaling(this: &Mesh, newScaling: Vector3);
-
     #[wasm_bindgen(method)]
     pub(crate) fn addRotation(this: &Mesh, x: f64, y: f64, z: f64);
 }
 
 impl Mesh {
     pub(crate) fn set_material(&self, material: &Material){
-        Reflect::set(&self, &JsValue::from_str("material"), &material).expect("material not found in Mesh");
+        Reflect::set(&self, &JsValue::from_str("material"), &material).unwrap();
+    }
+
+    pub(crate) fn set_parent(&self, parent: &Mesh){
+        Reflect::set(&self, &JsValue::from_str("parent"), &parent).unwrap();
+    }
+
+    pub(crate) fn scaling(&self) -> Vector3 {
+        Reflect::get(&self, &JsValue::from_str("scaling")).unwrap().unchecked_into()
+    }
+
+    pub(crate) fn set_scaling(&self, newScaling: Vector3){
+        Reflect::set(&self, &JsValue::from_str("scaling"), &newScaling).unwrap();
     }
 }
 
@@ -94,18 +103,10 @@ impl BabylonMesh {
     pub fn set_rotation(&self, rotation: Vector3) {
         self.mesh.set_rotation(rotation);
     }
-
     
     pub fn set_material(&self, material: &Material) {
         self.mesh.set_material(material);
     }
-
-    //     pub fn set_material<T>(&mut self, mat: &T)
-    //     where
-    //         T: Material,
-    //     {
-    //         BabylonApi::set_material(&mut self.js_ref, mat.get_js_ref());
-    //     }
 }
 
 impl Drop for BabylonMesh {

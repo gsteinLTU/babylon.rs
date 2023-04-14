@@ -36,9 +36,7 @@ pub fn main() {
                 Math::random() - 0.5,
                 Math::random() - 0.5,
             ));        
-            GAME.with(|game| {
-                game.borrow_mut().shapes.push(sphere);
-            });
+            game.borrow_mut().shapes.push(sphere);
         }
     });
 }
