@@ -35,7 +35,7 @@ thread_local! {
 pub fn main() {
     init_panic_hook();
 
-    let future = GAME.with(|game| {
+    wasm_bindgen_futures::spawn_local(GAME.with(|game| {
         let game_rc = Rc::clone(&game);
         async move {
             let gltf = game_rc
@@ -47,8 +47,25 @@ pub fn main() {
             // Example model has odd scaling
             gltf.set_scaling((-50.0, 50.0, 50.0).into());
             game_rc.borrow_mut().models.push(Rc::new(gltf));
-        }
-    });
 
-    wasm_bindgen_futures::spawn_local(future);
+            // Spawn another model
+            wasm_bindgen_futures::spawn_local(GAME.with(|game| {
+                let game_rc = Rc::clone(&game);
+                async move {
+                    let gltf = game_rc
+                        .borrow()
+                        .load_model("boombox2", "BoomBox.gltf")
+                        .await
+                        .unwrap();
+
+                    gltf.set_scaling((-70.0, 70.0, 70.0).into());
+                    gltf.set_position_x(2.0);
+                    game_rc.borrow_mut().models.push(Rc::new(gltf));
+                }
+            }));
+        }
+    }));
+
+
+    
 }
