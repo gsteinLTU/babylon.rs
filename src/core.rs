@@ -1,6 +1,10 @@
-use js_sys::Function;
-use wasm_bindgen::prelude::wasm_bindgen;
-use web_sys::Element;
+use std::mem;
+
+use js_sys::{Function, Reflect};
+use wasm_bindgen::{prelude::{wasm_bindgen, Closure}, JsValue, JsCast};
+use web_sys::{Element, console};
+
+use crate::prelude::Color3;
 
 #[wasm_bindgen]
 extern "C" {
@@ -13,6 +17,10 @@ extern "C" {
 
     #[wasm_bindgen(method)]
     pub fn runRenderLoop(this: &Engine, renderFunction: &Function);
+
+
+    #[wasm_bindgen(method)]
+    pub fn getDeltaTime(this: &Engine) -> f64;
 }
 
 #[wasm_bindgen]
@@ -27,66 +35,33 @@ extern "C" {
 
     #[wasm_bindgen(method)]
     pub fn render(this: &Scene, updateCameras: Option<bool>, ignoreAnimations: Option<bool>);
-}
 
-/*
-use crate::api::BabylonApi;
-use crate::math::*;
-use web::*;
-pub struct Scene {
-    ambient_color: Color,
-    clear_color: Color,
-    scene_ref: ExternRef,
+    #[wasm_bindgen(method)]
+    pub fn getEngine(this: &Scene) -> Engine;
 }
 
 impl Scene {
-    pub fn new(selector: &str) -> Scene {
-        let scene_ref = BabylonApi::create_scene(selector);
-        Scene {
-            clear_color: Color::new(0.0, 0.0, 0.0),
-            ambient_color: Color::new(0.0, 0.0, 0.0),
-            scene_ref,
-        }
-    }
-
-    pub fn create_from_basic_engine(selector: &str) -> Scene {
-        let scene_ref = BabylonApi::create_basic_scene(selector);
-        Scene {
-            clear_color: Color::new(0.0, 0.0, 0.0),
-            ambient_color: Color::new(0.0, 0.0, 0.0),
-            scene_ref,
-        }
-    }
-
-    pub fn get_js_ref(&self) -> &ExternRef {
-        &self.scene_ref
-    }
-
-    pub fn add_keyboard_observable(&self, callback: &str)
-    {
-        BabylonApi::add_keyboard_observable(&self.scene_ref, callback);
-    }
-
-    pub fn add_before_render_observable(&self, callback: &str)
-    {
-        BabylonApi::add_observable(
-            &self.scene_ref,
-            "onBeforeRenderObservable",
-            callback,
-        );
+    pub fn set_clear_color(&self, color: Color3) {
+        Reflect::set(&self, &JsValue::from_str("clearColor"), &color).unwrap();
     }
 
     pub fn get_delta_time(&self) -> f64 {
-        BabylonApi::get_delta_time(&self.scene_ref)
+        self.getEngine().getDeltaTime()
     }
 
-    pub fn set_ambient_color(&mut self, c: Color) {
-        self.ambient_color = c;
-        BabylonApi::set_ambient_color(self.get_js_ref(), c.x, c.y, c.z);
+    pub fn add_observable(&self, name: &str, cb: Closure<dyn FnMut()>) {
+        let target = Reflect::get(self, &name.into()).expect("Observable not found");
+        let target_add = Reflect::get(&target, &"add".into()).expect("Target not observable").unchecked_into::<Function>();
+        target_add.call1(&target, &cb.into_js_value()).expect("Could not add observer callback");
     }
 
-    pub fn set_clear_color(&mut self, c: Color) {
-        self.clear_color = c;
-        BabylonApi::set_clear_color(self.get_js_ref(), c.x, c.y, c.z);
+    pub fn add_keyboard_observable(&self, cb: Closure<dyn FnMut(JsValue, JsValue)>) {
+        
+        let target = Reflect::get(self, &"onKeyboardObservable".into()).expect("Observable not found");
+        let target_add = Reflect::get(&target, &"add".into()).expect("Target not observable");
+        
+        let target_add = target_add.dyn_into::<Function>().unwrap();
+
+        target_add.call1(&target, &cb.into_js_value()).expect("Could not add observer callback");
     }
-}*/
+}

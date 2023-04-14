@@ -88,3 +88,29 @@ impl StandardMaterial {
 //         return &self.js_ref;
 //     }
 // }
+
+
+
+/*
+            fn_set_emmisive_color: jsfn!(
+                r#"
+                Function(mat,r,g,b){
+                    mat.emissiveColor = new BABYLON.Color3(r, g, b);
+                }
+            "#
+            ),
+            fn_set_specular_color: jsfn!(
+                r#"
+                Function(mat,r,g,b){
+                    mat.specularColor = new BABYLON.Color3(r, g, b);
+                }
+            "#
+            ),
+            fn_set_ambient_color: jsfn!(
+                r#"
+                Function(mat,r,g,b){
+                    mat.ambientColor = new BABYLON.Color3(r, g, b);
+                }
+            "#
+            ),
+*/
