@@ -4,6 +4,7 @@ use wasm_bindgen::{prelude::wasm_bindgen, JsValue, JsCast};
 
 #[wasm_bindgen]
 extern "C" {
+    #[derive(Clone)]
     pub(crate) type Mesh;
 
     #[wasm_bindgen(constructor, js_namespace = BABYLON)]
@@ -56,6 +57,8 @@ impl Mesh {
     }
 }
 
+
+#[derive(Clone)]
 pub struct BabylonMesh {
     pub(crate) mesh: Mesh,
 }

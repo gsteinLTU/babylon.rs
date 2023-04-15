@@ -1,8 +1,6 @@
-use std::mem;
-
 use js_sys::{Function, Reflect};
 use wasm_bindgen::{prelude::{wasm_bindgen, Closure}, JsValue, JsCast};
-use web_sys::{Element, console};
+use web_sys::{Element};
 
 use crate::prelude::Color3;
 
