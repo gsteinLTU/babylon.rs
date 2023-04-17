@@ -59,4 +59,8 @@ impl Scene {
         let target_add = target_add.dyn_into::<Function>().unwrap();
         target_add.call1(&target, &cb.into_js_value()).expect("Could not add observer callback");
     }
+
+    pub fn add_before_render_observable(&self,  cb: Closure<dyn FnMut()>) {
+        self.add_observable("onBeforeRenderObservable", cb);
+    }
 }

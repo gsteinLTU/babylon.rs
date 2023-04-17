@@ -1,4 +1,4 @@
-use std::{cell::RefCell, f64::consts::PI, mem, rc::Rc};
+use std::{cell::RefCell, f64::consts::PI, rc::Rc};
 
 use wasm_bindgen::{
     prelude::{wasm_bindgen, Closure},
@@ -20,9 +20,7 @@ pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
         .expect("Selector not found")
         .expect("Selector not found");
 
-    let engine = Rc::new(RefCell::new(Engine::new(&canvas, true)));
-
-    let scene = Rc::new(RefCell::new(Scene::new(&engine.borrow())));
+    let scene = create_scene(selector);
 
     // Add a camera to the scene and attach it to the canvas
     let camera = ArcRotateCamera::new(
@@ -40,21 +38,6 @@ pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
     HemisphericLight::new("light1", Vector3::new(1.0, 1.0, 0.0), &scene.borrow());
     PointLight::new("light2", Vector3::new(0.0, 1.0, -1.0), &scene.borrow());
 
-    let closure_scene = scene.clone();
-    let renderloop_closure = Closure::<dyn FnMut()>::new(move || {
-        closure_scene.borrow().render(None, None);
-    });
-    engine
-        .borrow()
-        .runRenderLoop(renderloop_closure.as_ref().unchecked_ref());
-    mem::forget(renderloop_closure);
-
-    let resize_closure = Closure::<dyn FnMut()>::new(move || {
-        engine.borrow().resize(None);
-    });
-    window.set_onresize(Some(resize_closure.as_ref().unchecked_ref()));
-    mem::forget(resize_closure);
-
     scene
 }
 
@@ -69,6 +52,20 @@ pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
     let engine = Rc::new(RefCell::new(Engine::new(&canvas, true)));
 
     let scene = Rc::new(RefCell::new(Scene::new(&engine.borrow())));
+
+    let closure_scene = scene.clone();
+    let renderloop_closure = Closure::<dyn FnMut()>::new(move || {
+        closure_scene.borrow().render(None, None);
+    });
+    engine
+        .borrow()
+        .runRenderLoop(renderloop_closure.into_js_value().unchecked_ref());
+
+    let resize_closure = Closure::<dyn FnMut()>::new(move || {
+        engine.borrow().resize(None);
+    });
+    window.set_onresize(Some(resize_closure.into_js_value().unchecked_ref()));
+
     scene
 }
 

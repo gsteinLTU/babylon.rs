@@ -34,7 +34,7 @@ thread_local! {
 #[wasm_bindgen(start)]
 pub fn main() {
     GAME.with(|game| {
-        game.borrow().scene.borrow().add_observable("onBeforeRenderObservable", Closure::new(|| {
+        game.borrow().scene.borrow().add_before_render_observable(Closure::new(|| {
             GAME.with(|game| {
                 let delta_time = game.borrow().scene.borrow().get_delta_time();
                 *game.borrow().time.borrow_mut() += delta_time;
