@@ -30,7 +30,7 @@ where
     }));
 
     let t2 = Rc::clone(&t);
-    t.borrow().get_scene().borrow().add_keyboard_observable(Closure::new(move |e1, e2| {
+    t.borrow().get_scene().borrow().add_keyboard_observable(Closure::new(move |e1, _e2| {
         let event_type = Reflect::get(&e1, &"type".into()).unwrap();
         let key_code = Reflect::get(&e1, &"event".into()).unwrap();
         let key_code = Reflect::get(&key_code, &"inputIndex".into()).unwrap_or_default();

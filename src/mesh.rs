@@ -58,6 +58,7 @@ impl Mesh {
 }
 
 
+/// Wrapper for Mesh type in Babylon
 #[derive(Clone)]
 pub struct BabylonMesh {
     pub(crate) mesh: Mesh,
@@ -104,7 +105,16 @@ impl BabylonMesh {
     }
 
     pub fn set_rotation(&self, rotation: Vector3) {
+        self.mesh.set_rotationQuaternion(None);
         self.mesh.set_rotation(rotation);
+    }
+
+    pub fn rotation_quaternion(&self) -> Quaternion {
+        self.mesh.rotationQuaternion()
+    }
+
+    pub fn set_rotation_quaternion(&self, rotation: Quaternion) {
+        self.mesh.set_rotationQuaternion(Some(rotation));
     }
     
     pub fn set_material(&self, material: &Material) {

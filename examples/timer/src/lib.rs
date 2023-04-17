@@ -1,6 +1,5 @@
 use babylon::{prelude::*, api};
 use js_sys::Math;
-use std::borrow::BorrowMut;
 use std::rc::Rc;
 use std::sync::atomic::AtomicU16;
 use std::cell::RefCell;
@@ -21,7 +20,6 @@ impl Game {
         }
     }
 }
-
 
 thread_local! {
     static GAME: Rc<RefCell<Game>> = Rc::new(RefCell::new(Game::new()));

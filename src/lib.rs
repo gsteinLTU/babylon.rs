@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 pub mod api;
 pub mod basic_game;
 pub mod cameras;

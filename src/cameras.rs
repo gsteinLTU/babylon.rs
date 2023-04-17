@@ -19,8 +19,10 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    #[wasm_bindgen(extends = Camera)]
     pub type ArcRotateCamera;
-    #[wasm_bindgen(constructor, js_namespace = BABYLON, extends = Camera)]
+    
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
     pub fn new(
         name: &str,
         alpha: f64,
