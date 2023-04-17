@@ -54,12 +54,9 @@ impl Scene {
     }
 
     pub fn add_keyboard_observable(&self, cb: Closure<dyn FnMut(JsValue, JsValue)>) {
-        
         let target = Reflect::get(self, &"onKeyboardObservable".into()).expect("Observable not found");
         let target_add = Reflect::get(&target, &"add".into()).expect("Target not observable");
-        
         let target_add = target_add.dyn_into::<Function>().unwrap();
-
         target_add.call1(&target, &cb.into_js_value()).expect("Could not add observer callback");
     }
 }
