@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc, sync::atomic::AtomicU16};
 
-use babylon::{api, prelude::*};
+use neo_babylon::{api, prelude::*};
 use js_sys::{Math, Reflect};
 use wasm_bindgen::prelude::*;
 use web_sys::console;
@@ -29,7 +29,7 @@ thread_local! {
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    let closure = Closure::new(move |e1: JsValue, e2: JsValue| {
+    let closure = Closure::new(move |e1: JsValue, _: JsValue| {
         let event_type = Reflect::get(&e1, &"type".into()).unwrap();
         let key_code = Reflect::get(&e1, &"event".into()).unwrap();
         let key_code = Reflect::get(&key_code, &"inputIndex".into()).unwrap_or_default();
@@ -52,7 +52,7 @@ pub fn main() {
                             ..Default::default()
                         },
                     );
-                    sphere.set_position(Vector3::new(
+                    sphere.set_position(&Vector3::new(
                         Math::random() - 0.5,
                         Math::random() - 0.5,
                         Math::random() - 0.5,

@@ -1,5 +1,5 @@
 [package]
-name = "neo_babylon"
+name = "neo-babylon"
 version = "0.1.0"
 authors = ["Gordon Stein"]
 edition = "2021"
@@ -21,3 +21,4 @@ web-sys = {version = "0.3.61", features = [
   "console"
 ]}
 wasm-bindgen-futures = "0.4.34"
+impl_ops = "0.1.1"

@@ -10,7 +10,7 @@ use crate::core::*;
 
 pub trait BasicGame {
     fn get_scene(&self) -> Rc<RefCell<Scene>>;
-    fn run(&self, _delta_time: f64) {}
+    fn update(&self, _delta_time: f64) {}
     fn key_up(&self, _key_code: u8) {}
     fn key_down(&self, _key_code: u8) {}
     fn get_keys(&self) -> Rc<RefCell<HashSet<u8>>>;
@@ -26,7 +26,7 @@ where
         let g = t1.borrow();
         let scene = g.get_scene();
         let delta_time = scene.borrow().get_delta_time() / 1000.0;
-        t1.borrow().run(delta_time);
+        t1.borrow().update(delta_time);
     }));
 
     let t2 = Rc::clone(&t);

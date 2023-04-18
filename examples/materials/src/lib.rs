@@ -1,4 +1,4 @@
-use babylon::{api, prelude::*};
+use neo_babylon::{api, prelude::*};
 use js_sys::Math;
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -41,7 +41,7 @@ pub fn main() {
                     ..Default::default()
                 },
             );
-            cube.set_position(Vector3::new(
+            cube.set_position(&Vector3::new(
                 Math::random() - 0.5,
                 Math::random() - 0.5,
                 Math::random() - 0.5,

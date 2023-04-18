@@ -1,6 +1,9 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use js_sys::Reflect;
 use wasm_bindgen::JsValue;
+use std::ops;
+
+use impl_ops::*;
 
 use crate::get_set_jsvalue;
 
@@ -43,6 +46,19 @@ impl From<(f64, f64, f64)> for Vector3 {
     }
 }
 
+impl Vector3 {
+    pub fn set(&self, x: f64, y: f64, z: f64) {
+        self.set_x(x);
+        self.set_y(y);
+        self.set_z(z);
+    }
+}
+
+impl_op_ex!(+ |a: &Vector3, b: &Vector3| -> Vector3 { Vector3::new(a.x() + b.x(), a.y() + b.y(), a.z() + b.z()) });
+impl_op_ex!(- |a: &Vector3, b: &Vector3| -> Vector3 { Vector3::new(a.x() - b.x(), a.y() - b.y(), a.z() - b.z()) });
+impl_op_ex!(* |a: &Vector3, b: f64| -> Vector3 { Vector3::new(a.x() * b, a.y() * b, a.z() * b) });
+impl_op_ex!(/ |a: &Vector3, b: f64| -> Vector3 { Vector3::new(a.x() / b, a.y() / b, a.z() / b) });
+
 #[wasm_bindgen]
 extern "C" {
     /// A four-dimensional vector
@@ -81,6 +97,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_w(this: &Vector4, value: f64);
 }
+
+impl_op_ex!(+ |a: &Vector4, b: &Vector4| -> Vector4 { Vector4::new(a.x() + b.x(), a.y() + b.y(), a.z() + b.z(), a.w() + b.w()) });
+impl_op_ex!(- |a: &Vector4, b: &Vector4| -> Vector4 { Vector4::new(a.x() - b.x(), a.y() - b.y(), a.z() - b.z(), a.w() - b.w()) });
+impl_op_ex!(* |a: &Vector4, b: f64| -> Vector4 { Vector4::new(a.x() * b, a.y() * b, a.z() * b, a.w() * b) });
+impl_op_ex!(/ |a: &Vector4, b: f64| -> Vector4 { Vector4::new(a.x() / b, a.y() / b, a.z() / b, a.w() / b) });
 
 #[wasm_bindgen]
 extern "C" {

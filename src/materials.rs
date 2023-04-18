@@ -17,5 +17,5 @@ impl StandardMaterial {
     get_set_jsvalue!(get_specular_color, set_specular_color, "specularColor", Color3);
     get_set_jsvalue!(get_emmisive_color, set_emmisive_color, "emmisiveColor", Color3);
     get_set_jsvalue!(get_ambient_color, set_ambient_color, "ambientColor", Color3);
-    get_set_jsvalue!(get_alpha, set_alpha, "alpha", js_sys::Number);
+    get_set_jsvalue!(get_alpha, set_alpha, "alpha", f64);
 }

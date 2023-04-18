@@ -1,5 +1,6 @@
 use neo_babylon::{api, prelude::*};
 use js_sys::Math;
+use wasm_bindgen::JsCast;
 use std::cell::RefCell;
 use std::{collections::HashSet, rc::Rc};
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -50,7 +51,7 @@ impl Default for Game {
                 ..Default::default()
             },
         );
-        paddle_1.set_position(Vector3::new(0.0, 0.5, 0.0));
+        paddle_1.set_position(&Vector3::new(0.0, 0.5, 0.0));
         paddle_1.set_material(&paddle_mat);
         let paddle_2 = BabylonMesh::create_box(
             &scene.borrow(),
@@ -62,7 +63,7 @@ impl Default for Game {
                 ..Default::default()
             },
         );
-        paddle_2.set_position(Vector3::new(0.0, -0.5, 0.0));
+        paddle_2.set_position(&Vector3::new(0.0, -0.5, 0.0));
         paddle_2.set_material(&paddle_mat);
 
         Game {
@@ -89,44 +90,39 @@ impl BasicGame for Game {
         Rc::clone(&self.keys)
     }
 
-    fn run(&self, delta_time: f64) {
+    fn update(&self, delta_time: f64) {
         // Get positions
         let p2 = self.paddle_2.position();
         let bp = self.ball.position();
 
-        // Move ball
-        let mut b_x = self.ball_dir.x() * delta_time + bp.x();
-        let mut b_y = self.ball_dir.y() * delta_time + bp.y();
+        // Calculate new ball position
+        let bp_new = self.ball_dir.unchecked_ref::<Vector3>() * delta_time + bp;
 
-        if b_x > 0.75 || b_x < -0.75 {
+        if bp_new.x() > 0.75 || bp_new.x() < -0.75 {
             self.ball_dir.set_x(-self.ball_dir.x());
         }
-        if b_y > 0.75 || b_y < -0.75 {
+        if bp_new.y() > 0.75 || bp_new.y() < -0.75 {
             // Reset ball if outside play area
-            b_x = 0.0;
-            b_y = 0.0;
-            self.ball_dir.set_x(Math::random() - 0.5);
-            self.ball_dir.set_y(-self.ball_dir.y());
-        } else if b_y > 0.45 || (b_y < -0.45 && b_y > -0.55 && b_x <= p2.x() + 0.25 && b_x >= p2.x() - 0.25)
-        {
+            bp_new.set_x(0.0);
+            bp_new.set_y(0.0);
+            self.ball_dir.set(Math::random() - 0.5, -self.ball_dir.y(), 0.0);
+        } else if bp_new.y() > 0.45 || (bp_new.y() < -0.45 && bp_new.y() > -0.55 && bp_new.x() <= p2.x() + 0.25 && bp_new.x() >= p2.x() - 0.25) {
             // Hit paddle (top paddle is assumed to always hit)
             self.ball_dir.set_y(-self.ball_dir.y());
-            b_y = if b_y > 0.0 { 0.44 } else { -0.44 };
+            bp_new.set_y(if bp_new.y() > 0.0 { 0.44 } else { -0.44 });
         }
 
-        self.ball.set_position(Vector3::new(b_x, b_y, 0.0));
+        self.ball.set_position(&bp_new);
 
         // Move opponent paddle to match ball
-        self.paddle_1.set_position_x(b_x);
+        self.paddle_1.set_position_x(bp_new.x());
 
         // Determine direction based on keys down
-        if self.keys.borrow().contains(&37) {
-            self.paddle_dir.replace(1.0);
-        } else if self.keys.borrow().contains(&39) {
-            self.paddle_dir.replace(-1.0);
-        } else {
-            self.paddle_dir.replace(0.0);
-        }
+        match self.keys.borrow() {
+            x if x.contains(&37) => self.paddle_dir.replace(1.0),
+            x if x.contains(&39) => self.paddle_dir.replace(-1.0),
+            _ => self.paddle_dir.replace(0.0)
+        };
         
         // Move paddle if it has velocity
         let p2_x = p2.x() + delta_time * *self.paddle_dir.borrow();

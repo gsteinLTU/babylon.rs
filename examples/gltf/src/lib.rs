@@ -1,6 +1,6 @@
-use std::{cell::RefCell, rc::Rc, sync::{Mutex, Arc, RwLock}};
+use std::{cell::RefCell, rc::Rc};
 
-use babylon::{api, prelude::*};
+use neo_babylon::{api, prelude::*};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 #[wasm_bindgen]
@@ -49,7 +49,7 @@ pub fn main() {
                 .unwrap();
             
             // Example model has odd scaling
-            gltf.set_scaling((-50.0, 50.0, 50.0).into());            
+            gltf.set_scaling(&(-50.0, 50.0, 50.0).into());            
         }
     }));
 
@@ -63,7 +63,7 @@ pub fn main() {
                 .await
                 .unwrap();
 
-            gltf.set_scaling((-70.0, 70.0, 70.0).into());
+            gltf.set_scaling(&(-70.0, 70.0, 70.0).into());
             gltf.set_position_x(2.0);
         }
     }));

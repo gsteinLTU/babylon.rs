@@ -1,4 +1,4 @@
-use babylon::{prelude::*, api};
+use neo_babylon::{prelude::*, api};
 use js_sys::Math;
 use std::rc::Rc;
 use std::sync::atomic::AtomicU16;
@@ -46,7 +46,7 @@ pub fn main() {
                         &game.borrow().scene.borrow(), 
                         &format!("sphere_{}", i), 
                         SphereOptions { diameter: Math::random().into(), ..Default::default()});
-                    sphere.set_position(Vector3::new(
+                    sphere.set_position(&Vector3::new(
                         Math::random() - 0.5,
                         Math::random() - 0.5,
                         Math::random() - 0.5,

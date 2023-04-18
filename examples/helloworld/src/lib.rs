@@ -2,7 +2,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use js_sys::Math;
 use wasm_bindgen::prelude::*;
-use babylon::{prelude::*, api};
+use neo_babylon::{prelude::*, api};
 use web_sys::console;
 
 struct Game {
@@ -31,7 +31,7 @@ pub fn main() {
 
         for i in 0..10 { 
             let sphere = BabylonMesh::create_sphere(&game.borrow().scene.borrow(), format!("sphere_{}", i).as_str(), SphereOptions{ diameter: Some(Math::random() + 0.5), ..Default::default() });
-            sphere.set_position(Vector3::new(
+            sphere.set_position(&Vector3::new(
                 Math::random() - 0.5,
                 Math::random() - 0.5,
                 Math::random() - 0.5,
