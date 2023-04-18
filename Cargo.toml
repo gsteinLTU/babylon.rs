@@ -2,7 +2,7 @@
 name = "babylon"
 version = "0.0.15"
 authors = ["Richard Anaya"]
-edition = "2018"
+edition = "2021"
 description = "A wrapper for Babylon.js"
 license = "MIT OR Apache-2.0"
 categories = ["wasm"]
@@ -10,8 +10,6 @@ repository = "https://github.com/richardanaya/babylon"
 readme="README.md"
 
 [dependencies]
-lazy_static = "1.4.0"
-globals = "1.0.1"
 wasm-bindgen = "0.2.84"
 js-sys = "0.3.61"
 web-sys = {version = "0.3.61", features = [
