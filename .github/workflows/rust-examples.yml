@@ -35,9 +35,8 @@ jobs:
         shell: bash
         run: |
           cd examples
-          folders=$(tree -J -d -L 1 | jq -c '.[0].contents | map(.name)')
-          echo $folders
-          echo "folders={$folders}" >> "$GITHUB_OUTPUT"
+          echo "$(ls -d */ | jq -R -s -c 'split("\n")[:-1]')"
+          echo "::set-output name=folders::$(ls -d */ | jq -R -s -c 'split("\n")[:-1]')"
   
   build-examples:
     name: Build Examples
@@ -45,7 +44,7 @@ jobs:
     needs: [find-jobs]
     strategy:
       matrix:
-        folder: ${{ fromJson(needs.find-jobs.outputs.folders )}}
+        folder: ${{ fromJson(needs.find-jobs.outputs.folders) }}
     steps:
       - name: wasm-setup
         uses: jetli/wasm-pack-action@v0.4.0
