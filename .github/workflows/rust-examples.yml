@@ -50,7 +50,7 @@ jobs:
       - name: wasm-setup
         uses: jetli/wasm-pack-action@v0.4.0
       - name: wasm-pack build
-        working-directory: examples/${{ matrix.folder }}
+        working-directory: ./examples/${{ matrix.folder }}
         run: wasm-pack build --target web
   # Single deploy job since we're just deploying
   deploy:
