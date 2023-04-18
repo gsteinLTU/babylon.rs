@@ -11,3 +11,4 @@ pub mod math;
 pub mod mesh;
 pub mod prelude;
 pub mod shapes;
+pub(crate) mod util;

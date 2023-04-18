@@ -1,4 +1,8 @@
 use wasm_bindgen::prelude::wasm_bindgen;
+use js_sys::Reflect;
+use wasm_bindgen::JsValue;
+
+use crate::get_set_jsvalue;
 
 #[wasm_bindgen]
 extern "C" {
@@ -87,6 +91,12 @@ extern "C" {
     pub fn new(r: f64, g: f64, b: f64) -> Color3;
 }
 
+impl Color3 {
+    get_set_jsvalue!(r, set_r, "r", js_sys::Number);
+    get_set_jsvalue!(g, set_g, "g", js_sys::Number);
+    get_set_jsvalue!(b, set_b, "b", js_sys::Number);
+}
+
 #[wasm_bindgen]
 extern "C" {
     /// An RGBA color
@@ -94,6 +104,19 @@ extern "C" {
 
     #[wasm_bindgen(constructor, js_namespace = BABYLON)]
     pub fn new(r: f64, g: f64, b: f64, a: f64) -> Color4;
+}
+
+impl Color4 {
+    get_set_jsvalue!(r, set_r, "r", js_sys::Number);
+    get_set_jsvalue!(g, set_g, "g", js_sys::Number);
+    get_set_jsvalue!(b, set_b, "b", js_sys::Number);
+    get_set_jsvalue!(a, set_a, "a", js_sys::Number);
+}
+
+impl From<Color3> for Color4 {
+    fn from(value: Color3) -> Self {
+        Color4::new(value.r().into(), value.g().into(), value.b().into(), 1.0)
+    }
 }
 
 #[wasm_bindgen]

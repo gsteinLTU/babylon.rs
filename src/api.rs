@@ -1,7 +1,7 @@
 use std::{cell::RefCell, f64::consts::PI, rc::Rc};
 
 use wasm_bindgen::{
-    prelude::{wasm_bindgen, Closure},
+    prelude::Closure,
     JsCast,
 };
 
@@ -12,6 +12,9 @@ extern "C" {
     pub type BABYLON;
 }
 
+/// Create a simple Scene in the canvas referred to by the selector.
+/// 
+/// The scene will have an ArcRotateCamera, a HemisphericLight, and a PointLight.
 pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
     let window = web_sys::window().expect("should have a window in this context");
     let document = window.document().expect("window should have a document");
@@ -41,6 +44,7 @@ pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
     scene
 }
 
+/// Create a barebones Scene in the canvas referred to by the selector.
 pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
     let window = web_sys::window().expect("should have a window in this context");
     let document = window.document().expect("window should have a document");

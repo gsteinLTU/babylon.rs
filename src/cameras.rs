@@ -21,7 +21,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(extends = Camera)]
     pub type ArcRotateCamera;
-    
+
     #[wasm_bindgen(constructor, js_namespace = BABYLON)]
     pub fn new(
         name: &str,
@@ -33,6 +33,7 @@ extern "C" {
         setActiveOnSceneIfNoneActive: Option<bool>,
     ) -> ArcRotateCamera;
 
+    /// Attach the camera to the given canvas, necessary for user to manipulate the camera
     #[wasm_bindgen(method)]
     pub fn attachControl(this: &ArcRotateCamera, canvas: Element, noPreventDefault: bool);
 }

@@ -20,7 +20,7 @@ struct Game {
 impl Default for Game {
     fn default() -> Self {
         let scene = api::create_scene("#renderCanvas");
-        scene.borrow().set_clear_color(Color3::new(0.0, 0.0, 0.0));
+        scene.borrow().set_clear_color(Color4::new(0.0, 0.0, 0.0, 1.0));
 
         let _camera = ArcRotateCamera::default();
         let _light_1 =
