@@ -1,16 +1,16 @@
-# babylon.rs
+# neo-babylon
 
-<a href="https://docs.rs/babylon"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
+<a href="https://docs.rs/neo-babylon"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-A WebAssembly wrapper for [babylon.js](https://www.babylonjs.com/) in Rust.
+A WebAssembly wrapper for [BabylonJS](https://www.babylonjs.com/) in Rust. It is a fork of https://github.com/richardanaya/babylon.rs , but using wasm-bindgen and with additional features.
 
-This project is pre-alpha and the api is in active exploration. Current priorities:
+This project currently does not provide bindings to all BabylonJS, but this is not by intent.
+
+Current priorities:
 
 * get a basic GLTF up
 * get a camera
 * get some sort of interaction
-
-This project uses [`js_ffi`](https://github.com/richardanaya/js_ffi) for javascript binding and [`lazy_static`](https://github.com/rust-lang-nursery/lazy-static.rs) for global static singletons fairly extensively.
 
 # Idioms
 * Scenes hold 3D objects
@@ -20,134 +20,131 @@ This project uses [`js_ffi`](https://github.com/richardanaya/js_ffi) for javascr
 # HelloWorld
 
 <p align="center">
-  <img src="https://richardanaya.github.io/babylon.rs/images/demo_0.png">
+  <img src="images/demo_0.png">
 </p>
 
 ```rust
-use babylon::prelude::*;
-#[macro_use]
-extern crate lazy_static;
-use std::sync::Mutex;
+use std::{cell::RefCell, rc::Rc};
 
-lazy_static! {
-    static ref GAME: Mutex<Game> = Mutex::new(Game::new());
-}
+use js_sys::Math;
+use wasm_bindgen::prelude::*;
+use babylon::{prelude::*, api};
+use web_sys::console;
 
 struct Game {
-    scene: Scene,
-    shape: Vec<Sphere>,
+    scene: Rc<RefCell<Scene>>,
+    shapes: Vec<BabylonMesh>,
 }
 
 impl Game {
     fn new() -> Self {
         Game {
-            scene: Scene::create_from_basic_engine("#renderCanvas"),
-            shape: vec![],
+            scene: api::create_basic_scene("#renderCanvas"),
+            shapes: vec![],
         }
     }
 }
 
-#[no_mangle]
+thread_local! {
+    static GAME: RefCell<Game> = RefCell::new(Game::new());
+}
+
+#[wasm_bindgen(start)]
 pub fn main() {
-    babylon::js::log("Starting demo...");
-    let mut game = GAME.lock().unwrap();
-    for _ in 0..10 {
-        let mut sphere = Sphere::new(&game.scene, babylon::js::random());
-        sphere.set_position(Vector::new(
-            babylon::js::random() - 0.5,
-            babylon::js::random() - 0.5,
-            babylon::js::random() - 0.5,
-        ));
-        game.shape.push(sphere);
-    }
+    console::log_1(&"Starting demo...".into());
+
+    GAME.with(|game| {    
+
+        for i in 0..10 { 
+            let sphere = BabylonMesh::create_sphere(&game.borrow().scene.borrow(), format!("sphere_{}", i).as_str(), SphereOptions{ diameter: Some(Math::random() + 0.5), ..Default::default() });
+            sphere.set_position(Vector3::new(
+                Math::random() - 0.5,
+                Math::random() - 0.5,
+                Math::random() - 0.5,
+            ));        
+            game.borrow_mut().shapes.push(sphere);
+        }
+    });
 }
 ```
 
 See this demo [here](https://richardanaya.github.io/babylon.rs/examples/helloworld/index.html) ( be sure to play with mouse and arrow keys :arrow_left: :arrow_up: :arrow_down: :arrow_right:!)
 
-# Materials
+# Pong in under 150 Lines
 
 <p align="center">
-  <img src="https://richardanaya.github.io/babylon.rs/images/demo_1.png">
-</p>
-
-```rust
-let mut game = GAME.lock().unwrap();
-for _ in 0..10 {
-    let mut cube = Cube::new(
-        &game.scene,
-        babylon::js::random(),
-        babylon::js::random(),
-        babylon::js::random(),
-    );
-    let mut mat = StandardMaterial::new(&game.scene);
-    mat.set_diffuse_color(Color::new(babylon::js::random(),babylon::js::random(),babylon::js::random()));
-    mat.set_alpha(babylon::js::random());
-    cube.set_material(&mat);
-    cube.set_position(Vector::new(
-        babylon::js::random() - 0.5,
-        babylon::js::random() - 0.5,
-        babylon::js::random() - 0.5,
-    ));
-    game.shape.push(cube);
-}
-```
-
-See this demo [here](https://richardanaya.github.io/babylon.rs/examples/materials/index.html) ( be sure to play with mouse and arrow keys :arrow_left: :arrow_up: :arrow_down: :arrow_right:!)
-
-# GLTF
-
-<p align="center">
-  <img src="https://richardanaya.github.io/babylon.rs/images/demo_3.png">
-</p>
-
-```rust
-let mut game = GAME.lock().unwrap();
-let mut gltf = GLTF::new(&game.scene, "BoomBox.gltf");
-gltf.set_scaling(Vector::new(50.0, 50.0, 50.0));
-```
-
-See this demo [here](https://richardanaya.github.io/babylon.rs/examples/gltf/index.html) ( be sure to play with mouse and arrow keys :arrow_left: :arrow_up: :arrow_down: :arrow_right:!)
-
-# Pong in 100 Lines
-
-<p align="center">
-  <img src="https://richardanaya.github.io/babylon.rs/images/demo_2.png">
+  <img src="images/demo_2.png">
 </p>
 
 
 ```rust
-use babylon::prelude::*;
+use neo_babylon::{api, prelude::*};
+use js_sys::Math;
+use std::cell::RefCell;
+use std::{collections::HashSet, rc::Rc};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 struct Game {
-    scene: Scene,
-    _camera: Camera,
+    scene: Rc<RefCell<Scene>>,
+    _camera: ArcRotateCamera,
     _light_1: HemisphericLight,
     _light_2: PointLight,
-    ball: Sphere,
-    paddle_1: Cube,
-    paddle_2: Cube,
-    paddle_dir: f64,
-    ball_dir: Vector,
+    ball: BabylonMesh,
+    paddle_1: BabylonMesh,
+    paddle_2: BabylonMesh,
+    paddle_dir: RefCell<f64>,
+    ball_dir: Vector3,
+    keys: Rc<RefCell<HashSet<u8>>>,
 }
 
 impl Default for Game {
     fn default() -> Self {
-        let mut scene = Scene::new("#renderCanvas");
-        scene.set_clear_color(Color::new(0.0, 0.0, 0.0));
-        let _camera = Camera::new(&scene);
-        let _light_1 = HemisphericLight::new(&scene);
-        let _light_2 = PointLight::new(&scene);
-        let ball = Sphere::new(&scene, 0.05);
-        let mut paddle_mat = StandardMaterial::new(&scene);
-        paddle_mat.set_diffuse_color(Color::new(0.5, 0.5, 0.5));
-        paddle_mat.set_emmisive_color(Color::new(0.5, 0.5, 0.5));
-        let mut paddle_1 = Cube::new(&scene, 0.5, 0.05, 0.05);
-        paddle_1.set_position(Vector::new(0.0, 0.5, 0.0));
+        // Basic scene setup
+        let scene = api::create_scene("#renderCanvas");
+        scene.borrow().set_clear_color(Color4::new(0.0, 0.0, 0.0, 1.0));
+        let _camera = ArcRotateCamera::default();
+        let _light_1 =
+            HemisphericLight::new("Light1", Vector3::new(0.0, 0.0, 1.0), &scene.borrow());
+        let _light_2 = PointLight::new("Light2", Vector3::new(0.0, 1.0, 0.0), &scene.borrow());
+
+        // Create ball
+        let ball = BabylonMesh::create_sphere(
+            &scene.borrow(),
+            "ball",
+            SphereOptions {
+                diameter: Some(0.05),
+                ..Default::default()
+            },
+        );
+
+        // Create paddles
+        let paddle_mat = StandardMaterial::new("paddle_mat", &scene.borrow());
+        paddle_mat.set_diffuse_color(Color3::new(0.1, 0.5, 0.1));
+        let paddle_1 = BabylonMesh::create_box(
+            &scene.borrow(),
+            "paddle_1",
+            BoxOptions {
+                width: Some(0.5),
+                height: Some(0.05),
+                depth: Some(0.05),
+                ..Default::default()
+            },
+        );
+        paddle_1.set_position(Vector3::new(0.0, 0.5, 0.0));
         paddle_1.set_material(&paddle_mat);
-        let mut paddle_2 = Cube::new(&scene, 0.5, 0.05, 0.05);
-        paddle_2.set_position(Vector::new(0.0, -0.5, 0.0));
+        let paddle_2 = BabylonMesh::create_box(
+            &scene.borrow(),
+            "paddle_2",
+            BoxOptions {
+                width: Some(0.5),
+                height: Some(0.05),
+                depth: Some(0.05),
+                ..Default::default()
+            },
+        );
+        paddle_2.set_position(Vector3::new(0.0, -0.5, 0.0));
         paddle_2.set_material(&paddle_mat);
+
         Game {
             scene,
             _camera,
@@ -156,64 +153,70 @@ impl Default for Game {
             ball,
             paddle_1,
             paddle_2,
-            paddle_dir: 0.0,
-            ball_dir: Vector::new(babylon::js::random() - 0.5, -1.0, 0.0),
+            paddle_dir: RefCell::new(0.0),
+            ball_dir: Vector3::new(Math::random() - 0.5, -1.0, 0.0),
+            keys: Rc::new(RefCell::new(HashSet::<u8>::new())),
         }
     }
 }
 
 impl BasicGame for Game {
-    fn get_scene(&self) -> &Scene {
-        &self.scene
+    fn get_scene(&self) -> Rc<RefCell<Scene>> {
+        self.scene.clone()
     }
 
-    fn run(&mut self, delta_time: f64) {
-        // get positions
-        let p2 = self.paddle_2.get_position();
-        let bp = self.ball.get_position();
+    fn get_keys(&self) -> Rc<RefCell<HashSet<u8>>> {
+        Rc::clone(&self.keys)
+    }
 
-        // move ball
-        let b_x = self.ball_dir.x * delta_time + bp.x;
-        let b_y = self.ball_dir.y * delta_time + bp.y;
-        if b_x > 0.5 || b_x < -0.5 {
-            self.ball_dir.x = -self.ball_dir.x;
+    fn run(&self, delta_time: f64) {
+        // Get positions
+        let p2 = self.paddle_2.position();
+        let bp = self.ball.position();
+
+        // Move ball
+        let mut b_x = self.ball_dir.x() * delta_time + bp.x();
+        let mut b_y = self.ball_dir.y() * delta_time + bp.y();
+
+        if b_x > 0.75 || b_x < -0.75 {
+            self.ball_dir.set_x(-self.ball_dir.x());
         }
-
         if b_y > 0.75 || b_y < -0.75 {
-            self.ball.set_position(Vector::new(0.0, 0.0, 0.0));
-            self.ball_dir.x = babylon::js::random() - 0.5;
-            self.ball_dir.y = -self.ball_dir.y;
-        } else if b_y > 0.45 || (b_y < -0.45 && b_x <= p2.x + 0.25 && b_x >= p2.x - 0.25) {
-            self.ball_dir.y = -self.ball_dir.y;
-            self.ball.set_position(Vector::new(b_x, b_y, 0.0));
-        } else {
-            self.ball.set_position(Vector::new(b_x, b_y, 0.0));
+            // Reset ball if outside play area
+            b_x = 0.0;
+            b_y = 0.0;
+            self.ball_dir.set_x(Math::random() - 0.5);
+            self.ball_dir.set_y(-self.ball_dir.y());
+        } else if b_y > 0.45 || (b_y < -0.45 && b_y > -0.55 && b_x <= p2.x() + 0.25 && b_x >= p2.x() - 0.25)
+        {
+            // Hit paddle (top paddle is assumed to always hit)
+            self.ball_dir.set_y(-self.ball_dir.y());
+            b_y = if b_y > 0.0 { 0.44 } else { -0.44 };
         }
 
-        // move opponent paddle to match ball
+        self.ball.set_position(Vector3::new(b_x, b_y, 0.0));
+
+        // Move opponent paddle to match ball
         self.paddle_1.set_position_x(b_x);
 
-        // move paddle if it has velocity
-        if self.paddle_dir != 0.0 {
-            let p2_x = p2.x + delta_time * self.paddle_dir;
-            self.paddle_2.set_position_x(p2_x)
+        // Determine direction based on keys down
+        if self.keys.borrow().contains(&37) {
+            self.paddle_dir.replace(1.0);
+        } else if self.keys.borrow().contains(&39) {
+            self.paddle_dir.replace(-1.0);
+        } else {
+            self.paddle_dir.replace(0.0);
         }
-    }
-
-    fn key_up(&mut self, _key_code: f64) {
-        self.paddle_dir = 0.0;
-    }
-
-    fn key_down(&mut self, key_code: f64) {
-        if key_code == 37.0 {
-            self.paddle_dir = 1.0;
-        } else if key_code == 39.0 {
-            self.paddle_dir = -1.0;
+        
+        // Move paddle if it has velocity
+        let p2_x = p2.x() + delta_time * *self.paddle_dir.borrow();
+        if p2_x > -0.5 && p2_x < 0.5 {
+            self.paddle_2.set_position_x(p2_x);
         }
     }
 }
 
-#[no_mangle]
+#[wasm_bindgen(start)]
 pub fn main() {
     run_basic_game::<Game>();
 }
@@ -240,5 +243,5 @@ at your option.
 ### Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in `babylon.rs` by you, as defined in the Apache-2.0 license, shall be
+for inclusion in this library by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.

@@ -1,72 +1,73 @@
-use crate::api::BabylonApi;
-use crate::math::*;
-use alloc::boxed::Box;
-use js_ffi::*;
+use js_sys::{Function, Reflect};
+use wasm_bindgen::{prelude::{wasm_bindgen, Closure}, JsValue, JsCast, closure::WasmClosure};
+use web_sys::{Element};
 
-pub struct Scene {
-    ambient_color: Color,
-    clear_color: Color,
-    scene_ref: JSObject,
+use crate::prelude::{Color4};
+
+#[wasm_bindgen]
+extern "C" {
+    pub type Engine;
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(canvas: &Element, b: bool) -> Engine;
+
+    #[wasm_bindgen(method)]
+    pub fn resize(this: &Engine, forceSetSize: Option<bool>);
+
+    #[wasm_bindgen(method)]
+    pub fn runRenderLoop(this: &Engine, renderFunction: &Function);
+
+
+    #[wasm_bindgen(method)]
+    pub fn getDeltaTime(this: &Engine) -> f64;
 }
+
+#[wasm_bindgen]
+extern "C" {
+    pub type Scene;
+
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(engine: &Engine) -> Scene;
+
+    #[wasm_bindgen(method)]
+    pub fn createDefaultEnvironment(this: &Scene);
+
+    #[wasm_bindgen(method)]
+    pub fn render(this: &Scene, updateCameras: Option<bool>, ignoreAnimations: Option<bool>);
+
+    #[wasm_bindgen(method)]
+    pub fn getEngine(this: &Scene) -> Engine;
+}
+
 
 impl Scene {
-    pub fn new(selector: &str) -> Scene {
-        let scene_ref = BabylonApi::create_scene(selector);
-        Scene {
-            clear_color: Color::new(0.0, 0.0, 0.0),
-            ambient_color: Color::new(0.0, 0.0, 0.0),
-            scene_ref,
-        }
+    /// Set the background color for rendering the Scene
+    pub fn set_clear_color(&self, color: Color4) {
+        Reflect::set(&self, &JsValue::from_str("clearColor"), &color).unwrap();
     }
 
-    pub fn create_from_basic_engine(selector: &str) -> Scene {
-        let scene_ref = BabylonApi::create_basic_scene(selector);
-        Scene {
-            clear_color: Color::new(0.0, 0.0, 0.0),
-            ambient_color: Color::new(0.0, 0.0, 0.0),
-            scene_ref,
-        }
-    }
-
-    pub fn get_js_ref(&self) -> &JSObject {
-        &self.scene_ref
-    }
-
-    pub fn add_keyboard_observable<T>(&self, callback: T)
-    where
-        T: 'static + FnMut(JSValue, JSValue) -> () + Send,
-    {
-        BabylonApi::add_keyboard_observable(&self.scene_ref, Box::new(callback));
-    }
-
-    pub fn add_before_render_observable<T>(&self, callback: T)
-    where
-        T: 'static + FnMut() -> () + Send,
-    {
-        BabylonApi::add_observable(
-            &self.scene_ref,
-            "onBeforeRenderObservable",
-            Box::new(callback),
-        );
-    }
-
+    /// Gets the time spent between current and previous frame, in ms
     pub fn get_delta_time(&self) -> f64 {
-        BabylonApi::get_delta_time(&self.scene_ref)
+        self.getEngine().getDeltaTime()
     }
 
-    pub fn set_ambient_color(&mut self, c: Color) {
-        self.ambient_color = c;
-        BabylonApi::set_ambient_color(self.get_js_ref(), c.x, c.y, c.z);
+    /// Add a Closure to run when an observable on the Scene changes
+    /// 
+    /// See "Properties" list on https://doc.babylonjs.com/typedoc/classes/BABYLON.Scene for names of observables
+    pub fn add_observable<F>(&self, name: &str, cb: Closure<F>)
+            where F: WasmClosure + ?Sized
+    {
+        let target = Reflect::get(self, &name.into()).expect("Observable not found");
+        let target_add = Reflect::get(&target, &"add".into()).expect("Target not observable").unchecked_into::<Function>();
+        target_add.call1(&target, &cb.into_js_value()).expect("Could not add observer callback");
     }
 
-    pub fn set_clear_color(&mut self, c: Color) {
-        self.clear_color = c;
-        BabylonApi::set_clear_color(self.get_js_ref(), c.x, c.y, c.z);
+    /// add_observable special case for onKeyboardObservable
+    pub fn add_keyboard_observable(&self, cb: Closure<dyn FnMut(JsValue, JsValue)>) {
+        self.add_observable("onKeyboardObservable", cb);
     }
-}
 
-impl Drop for Scene {
-    fn drop(&mut self) {
-        release_object(&self.scene_ref)
+    /// add_observable special case for onBeforeRenderObservable
+    pub fn add_before_render_observable(&self,  cb: Closure<dyn FnMut()>) {
+        self.add_observable("onBeforeRenderObservable", cb);
     }
 }

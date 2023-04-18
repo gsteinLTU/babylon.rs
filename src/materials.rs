@@ -1,61 +1,21 @@
-use crate::api::BabylonApi;
-use crate::core::*;
-use crate::math::*;
-use js_ffi::*;
+use crate::prelude::*;
 
-pub trait Material {
-    fn get_js_ref(&self) -> &JSObject;
-}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = BABYLON)]
+    pub type Material;
+    
+    #[wasm_bindgen(extends = Material, js_namespace = BABYLON)]
+    pub type StandardMaterial;
 
-pub struct StandardMaterial {
-    js_ref: JSObject,
-    diffuse_color: Color,
-    specular_color: Color,
-    emmisive_color: Color,
-    ambient_color: Color,
-    alpha: f64,
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(name: &str, scene: &Scene) -> StandardMaterial;
 }
 
 impl StandardMaterial {
-    pub fn new(scene: &Scene) -> StandardMaterial {
-        StandardMaterial {
-            js_ref: BabylonApi::create_standard_material(scene.get_js_ref()),
-            diffuse_color: Color::new(0.0, 0.0, 0.0),
-            specular_color: Color::new(0.0, 0.0, 0.0),
-            emmisive_color: Color::new(0.0, 0.0, 0.0),
-            ambient_color: Color::new(0.0, 0.0, 0.0),
-            alpha: 1.0,
-        }
-    }
-
-    pub fn set_diffuse_color(&mut self, c: Color) {
-        self.diffuse_color = c;
-        BabylonApi::set_diffuse_color(self.get_js_ref(), c.x, c.y, c.z);
-    }
-
-    pub fn set_emmisive_color(&mut self, c: Color) {
-        self.emmisive_color = c;
-        BabylonApi::set_emmisive_color(self.get_js_ref(), c.x, c.y, c.z);
-    }
-
-    pub fn set_specular_color(&mut self, c: Color) {
-        self.specular_color = c;
-        BabylonApi::set_specular_color(self.get_js_ref(), c.x, c.y, c.z);
-    }
-
-    pub fn set_ambient_color(&mut self, c: Color) {
-        self.ambient_color = c;
-        BabylonApi::set_ambient_color(self.get_js_ref(), c.x, c.y, c.z);
-    }
-
-    pub fn set_alpha(&mut self, a: f64) {
-        self.alpha = a;
-        BabylonApi::set_alpha(self.get_js_ref(), a);
-    }
-}
-
-impl Material for StandardMaterial {
-    fn get_js_ref(&self) -> &JSObject {
-        return &self.js_ref;
-    }
+    get_set_jsvalue!(get_diffuse_color, set_diffuse_color, "diffuseColor", Color3);
+    get_set_jsvalue!(get_specular_color, set_specular_color, "specularColor", Color3);
+    get_set_jsvalue!(get_emmisive_color, set_emmisive_color, "emmisiveColor", Color3);
+    get_set_jsvalue!(get_ambient_color, set_ambient_color, "ambientColor", Color3);
+    get_set_jsvalue!(get_alpha, set_alpha, "alpha", f64);
 }

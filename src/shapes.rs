@@ -1,209 +1,83 @@
-use crate::api::BabylonApi;
-use crate::core::*;
-use crate::materials::*;
-use crate::math::*;
-use js_ffi::*;
+use js_sys::{Promise, Array};
+use crate::prelude::*;
 
-pub struct Sphere {
-    position: Vector3<f64>,
-    js_ref: JSObject,
+#[wasm_bindgen]
+extern "C" {
+    type MeshBuilder;
+
+    #[wasm_bindgen(static_method_of = MeshBuilder, js_namespace = BABYLON)]
+    fn CreateSphere(name: &str, options: SphereOptions, scene: &Scene) -> Mesh;
+
+    #[wasm_bindgen(static_method_of = MeshBuilder, js_namespace = BABYLON)]
+    fn CreateBox(name: &str, options: BoxOptions, scene: &Scene) -> Mesh;
 }
 
-impl Sphere {
-    pub fn new(scene: &Scene, size: f64) -> Sphere {
-        Sphere {
-            position: Vector3::new(0.0, 0.0, 0.0),
-            js_ref: BabylonApi::create_sphere(scene.get_js_ref(), size),
+#[wasm_bindgen]
+#[derive(Default)]
+pub struct SphereOptions {
+    pub arc: Option<f64>,
+    pub diameter: Option<f64>,
+    pub diameterX: Option<f64>,
+    pub diameterY: Option<f64>,
+    pub diameterZ: Option<f64>,
+    pub segments: Option<f64>,
+    pub sideOrientation: Option<f64>,
+    pub slice: Option<f64>,
+    pub updatable: Option<bool>,
+}
+
+#[wasm_bindgen]
+#[derive(Default)]
+pub struct BoxOptions {
+    pub bottomBaseAt: Option<f64>,
+    pub depth: Option<f64>,
+    pub height: Option<f64>,
+    pub sideOrientation: Option<f64>,
+    pub size: Option<f64>,
+    pub topBaseAt: Option<f64>,
+    pub updatable: Option<bool>,
+    pub width: Option<f64>,
+    pub wrap: Option<bool>,
+}
+
+#[wasm_bindgen]
+extern "C" {
+    pub(crate) type SceneLoader;
+
+    #[wasm_bindgen(static_method_of = SceneLoader, js_namespace = BABYLON)]
+    pub(crate) fn ImportMeshAsync(meshNames: Option<&str>, rootUrl: &str, sceneFilename: &str, scene: Option<&Scene>) -> Promise;
+}
+
+impl BabylonMesh {
+    pub fn create_sphere(scene: &Scene, name: &str, options: SphereOptions) -> BabylonMesh {
+        BabylonMesh {
+            mesh: MeshBuilder::CreateSphere(name, options, scene),
         }
     }
 
-    pub fn get_position(&self) -> &Vector {
-        &self.position
-    }
-
-    pub fn set_position(&mut self, p: Vector) {
-        self.position = p;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_position_x(&mut self, v: f64) {
-        self.position.x = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_position_y(&mut self, v: f64) {
-        self.position.y = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_position_z(&mut self, v: f64) {
-        self.position.z = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_material<T>(&mut self, mat: &T)
-    where
-        T: Material,
-    {
-        BabylonApi::set_material(&mut self.js_ref, mat.get_js_ref());
-    }
-}
-
-impl Drop for Sphere {
-    fn drop(&mut self) {
-        BabylonApi::dispose_mesh(&mut self.js_ref);
-        release_object(&self.js_ref)
-    }
-}
-
-pub struct Cube {
-    position: Vector3<f64>,
-    js_ref: JSObject,
-}
-
-impl Cube {
-    pub fn new(scene: &Scene, width: f64, height: f64, depth: f64) -> Cube {
-        Cube {
-            position: Vector3::new(0.0, 0.0, 0.0),
-            js_ref: BabylonApi::create_cube(scene.get_js_ref(), width, height, depth),
+    pub fn create_box(scene: &Scene, name: &str, options: BoxOptions) -> BabylonMesh {
+        BabylonMesh {
+            mesh: MeshBuilder::CreateBox(name, options, scene),
         }
     }
 
-    pub fn get_position(&self) -> &Vector {
-        &self.position
-    }
+    pub async fn create_gltf(scene: &Scene, name: &str, file: &str) -> BabylonMesh {
+        let dummy = Mesh::new(name, scene.into());
+        let promise = SceneLoader::ImportMeshAsync(None, "", file, scene.into());
+        let import = wasm_bindgen_futures::JsFuture::from(promise);
 
-    pub fn set_position(&mut self, p: Vector) {
-        self.position = p;
-        BabylonApi::set_position(&mut self.js_ref, p.x, p.y, p.z);
-    }
+        let import_result = import.await.expect("Error reading GLTF file");
 
-    pub fn set_position_x(&mut self, v: f64) {
-        self.position.x = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
+        let imported_meshes = &Reflect::get(&import_result, &JsValue::from_str("meshes")).expect("Error reading GLTF file");
+        let imported_meshes_array = imported_meshes.unchecked_ref::<Array>();
 
-    pub fn set_position_y(&mut self, v: f64) {
-        self.position.y = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_position_z(&mut self, v: f64) {
-        self.position.z = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_material<T>(&mut self, mat: &T)
-    where
-        T: Material,
-    {
-        BabylonApi::set_material(&mut self.js_ref, mat.get_js_ref());
-    }
-}
-
-impl Drop for Cube {
-    fn drop(&mut self) {
-        BabylonApi::dispose_mesh(&mut self.js_ref);
-        release_object(&self.js_ref)
-    }
-}
-
-pub struct GLTF {
-    position: Vector3<f64>,
-    js_ref: JSObject,
-}
-
-impl GLTF {
-    pub fn new(scene: &Scene, file: &str) -> GLTF {
-        GLTF {
-            position: Vector3::new(0.0, 0.0, 0.0),
-            js_ref: BabylonApi::create_gltf(scene.get_js_ref(), file),
+        for val in imported_meshes_array.iter() { 
+            let mesh: &Mesh = val.unchecked_ref::<Mesh>();
+            mesh.set_parent(&dummy);
         }
-    }
 
-    pub fn get_position(&self) -> &Vector {
-        &self.position
-    }
-
-    pub fn set_position(&mut self, p: Vector) {
-        self.position = p;
-        BabylonApi::set_position(&mut self.js_ref, p.x, p.y, p.z);
-    }
-
-    pub fn set_position_x(&mut self, v: f64) {
-        self.position.x = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_position_y(&mut self, v: f64) {
-        self.position.y = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_position_z(&mut self, v: f64) {
-        self.position.z = v;
-        BabylonApi::set_position(
-            &mut self.js_ref,
-            self.position.x,
-            self.position.y,
-            self.position.z,
-        );
-    }
-
-    pub fn set_scaling(&mut self, p: Vector) {
-        self.position = p;
-        BabylonApi::set_scaling(&mut self.js_ref, p.x, p.y, p.z);
-    }
-}
-
-impl Drop for GLTF {
-    fn drop(&mut self) {
-        BabylonApi::dispose_mesh(&mut self.js_ref);
-        release_object(&self.js_ref)
+        BabylonMesh {
+            mesh: dummy,
+        }
     }
 }

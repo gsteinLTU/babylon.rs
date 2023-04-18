@@ -1,50 +1,60 @@
-use babylon::prelude::*;
-#[macro_use]
-extern crate lazy_static;
-use std::sync::Mutex;
-
-lazy_static! {
-    static ref GAME: Mutex<Game> = Mutex::new(Game::new());
-}
+use neo_babylon::{api, prelude::*};
+use js_sys::Math;
+use std::{cell::RefCell, rc::Rc};
+use wasm_bindgen::prelude::wasm_bindgen;
+use web_sys::console;
 
 struct Game {
-    scene: Scene,
-    shape: Vec<Cube>,
+    scene: Rc<RefCell<Scene>>,
+    shapes: Vec<BabylonMesh>,
 }
 
 impl Game {
     fn new() -> Self {
         Game {
-            scene: Scene::create_from_basic_engine("#renderCanvas"),
-            shape: vec![],
+            scene: api::create_basic_scene("#renderCanvas"),
+            shapes: vec![],
         }
     }
 }
 
-#[no_mangle]
+thread_local! {
+    static GAME: RefCell<Game> = RefCell::new(Game::new());
+}
+
+#[wasm_bindgen(start)]
 pub fn main() {
-    babylon::js::log("Starting demo...");
-    let mut game = GAME.lock().unwrap();
-    for _ in 0..10 {
-        let mut cube = Cube::new(
-            &game.scene,
-            babylon::js::random(),
-            babylon::js::random(),
-            babylon::js::random(),
-        );
-        let mut mat = StandardMaterial::new(&game.scene);
-        mat.set_diffuse_color(Color::new(
-            babylon::js::random(),
-            babylon::js::random(),
-            babylon::js::random(),
-        ));
-        mat.set_alpha(babylon::js::random());
-        cube.set_material(&mat);
-        cube.set_position(Vector::new(
-            babylon::js::random() - 0.5,
-            babylon::js::random() - 0.5,
-            babylon::js::random() - 0.5,
-        ));
-        game.shape.push(cube);
-    }
+    let num_cubes = 10;
+
+    console::log_1(&"Starting demo...".into());
+
+    GAME.with(|game| {
+        for i in 0..num_cubes {
+            // Create cube of random size at random position
+            let cube = BabylonMesh::create_box(
+                &game.borrow().scene.borrow(),
+                format!("box_{}", i).as_str(),
+                BoxOptions {
+                    depth: Math::random().into(),
+                    height: Math::random().into(),
+                    width: Math::random().into(),
+                    ..Default::default()
+                },
+            );
+            cube.set_position(&Vector3::new(
+                Math::random() - 0.5,
+                Math::random() - 0.5,
+                Math::random() - 0.5,
+            ));
+
+            // Create material with random color
+            let mat =
+                StandardMaterial::new(format!("mat_{}", i).as_str(), &game.borrow().scene.borrow());
+            mat.set_diffuse_color(Color3::new(Math::random(), Math::random(), Math::random()));
+            mat.set_alpha(Math::random());
+            cube.set_material(&mat);
+
+            game.borrow_mut().shapes.push(cube);
+        }
+    });
 }

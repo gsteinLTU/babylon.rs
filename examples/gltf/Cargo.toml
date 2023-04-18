@@ -1,14 +1,18 @@
 [package]
 name = "example"
 version = "0.0.0"
-authors = ["Richard Anaya"]
-edition = "2018"
+authors = ["Gordon Stein"]
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-babylon = {path="../../"}
-lazy_static = "1.4.0"
+neo-babylon = {path="../../"}
+console_error_panic_hook = "0.1.7"
+js-sys = "0.3.61"
+wasm-bindgen = "0.2.84"
+wasm-bindgen-futures = "0.4.34"
+web-sys = { version = "0.3.61", features = ["console"] }
 
 [lib]
 crate-type =["cdylib"]
