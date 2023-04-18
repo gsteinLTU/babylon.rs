@@ -55,7 +55,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.folder }}
-          path: ./examples/${{ matrix.folder }}/
+          path: ./examples/${{ matrix.folder }}/pkg/
     
   # Single deploy job since we're just deploying
   deploy:
