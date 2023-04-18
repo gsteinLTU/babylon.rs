@@ -26,7 +26,7 @@ jobs:
     name: Find Jobs
     runs-on: ubuntu-latest
     outputs:
-      folders: ${{ steps.jobs.outputs.folders }}
+      folders: ${{ steps.set-folders.outputs.folders }}
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt update && sudo apt install tree jq -y
@@ -34,7 +34,7 @@ jobs:
       - id: set-folders
         shell: bash
         run: |
-          cd ${{ inputs.path }}
+          cd examples
           folders=$(tree -J -d -L 1 | jq -c '.[0].contents | map(.name)')
           echo $folders
           echo "{folders}={$folders}" >> $GITHUB_OUTPUT
