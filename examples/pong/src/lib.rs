@@ -1,4 +1,4 @@
-use babylon::{api, prelude::*};
+use neo_babylon::{api, prelude::*};
 use js_sys::Math;
 use std::cell::RefCell;
 use std::{collections::HashSet, rc::Rc};
@@ -19,14 +19,15 @@ struct Game {
 
 impl Default for Game {
     fn default() -> Self {
+        // Basic scene setup
         let scene = api::create_scene("#renderCanvas");
         scene.borrow().set_clear_color(Color4::new(0.0, 0.0, 0.0, 1.0));
-
         let _camera = ArcRotateCamera::default();
         let _light_1 =
             HemisphericLight::new("Light1", Vector3::new(0.0, 0.0, 1.0), &scene.borrow());
         let _light_2 = PointLight::new("Light2", Vector3::new(0.0, 1.0, 0.0), &scene.borrow());
 
+        // Create ball
         let ball = BabylonMesh::create_sphere(
             &scene.borrow(),
             "ball",
@@ -36,6 +37,7 @@ impl Default for Game {
             },
         );
 
+        // Create paddles
         let paddle_mat = StandardMaterial::new("paddle_mat", &scene.borrow());
         paddle_mat.set_diffuse_color(Color3::new(0.1, 0.5, 0.1));
         let paddle_1 = BabylonMesh::create_box(
@@ -88,11 +90,11 @@ impl BasicGame for Game {
     }
 
     fn run(&self, delta_time: f64) {
-        // get positions
+        // Get positions
         let p2 = self.paddle_2.position();
         let bp = self.ball.position();
 
-        // move ball
+        // Move ball
         let mut b_x = self.ball_dir.x() * delta_time + bp.x();
         let mut b_y = self.ball_dir.y() * delta_time + bp.y();
 
@@ -114,10 +116,10 @@ impl BasicGame for Game {
 
         self.ball.set_position(Vector3::new(b_x, b_y, 0.0));
 
-        // move opponent paddle to match ball
+        // Move opponent paddle to match ball
         self.paddle_1.set_position_x(b_x);
 
-        // move paddle if it has velocity
+        // Determine direction based on keys down
         if self.keys.borrow().contains(&37) {
             self.paddle_dir.replace(1.0);
         } else if self.keys.borrow().contains(&39) {
@@ -125,7 +127,8 @@ impl BasicGame for Game {
         } else {
             self.paddle_dir.replace(0.0);
         }
-
+        
+        // Move paddle if it has velocity
         let p2_x = p2.x() + delta_time * *self.paddle_dir.borrow();
         if p2_x > -0.5 && p2_x < 0.5 {
             self.paddle_2.set_position_x(p2_x);

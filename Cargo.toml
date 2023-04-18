@@ -1,12 +1,12 @@
 [package]
-name = "babylon"
-version = "0.0.15"
-authors = ["Richard Anaya"]
+name = "neo_babylon"
+version = "0.1.0"
+authors = ["Gordon Stein"]
 edition = "2021"
-description = "A wrapper for Babylon.js"
+description = "A wasm-bindgen-based wrapper for Babylon.js"
 license = "MIT OR Apache-2.0"
 categories = ["wasm"]
-repository = "https://github.com/richardanaya/babylon"
+repository = "https://github.com/gsteinLTU/babylon"
 readme="README.md"
 
 [dependencies]

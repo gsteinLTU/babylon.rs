@@ -92,9 +92,9 @@ extern "C" {
 }
 
 impl Color3 {
-    get_set_jsvalue!(r, set_r, "r", js_sys::Number);
-    get_set_jsvalue!(g, set_g, "g", js_sys::Number);
-    get_set_jsvalue!(b, set_b, "b", js_sys::Number);
+    get_set_jsvalue!(r, set_r, "r", f64);
+    get_set_jsvalue!(g, set_g, "g", f64);
+    get_set_jsvalue!(b, set_b, "b", f64);
 }
 
 #[wasm_bindgen]
@@ -107,10 +107,10 @@ extern "C" {
 }
 
 impl Color4 {
-    get_set_jsvalue!(r, set_r, "r", js_sys::Number);
-    get_set_jsvalue!(g, set_g, "g", js_sys::Number);
-    get_set_jsvalue!(b, set_b, "b", js_sys::Number);
-    get_set_jsvalue!(a, set_a, "a", js_sys::Number);
+    get_set_jsvalue!(r, set_r, "r", f64);
+    get_set_jsvalue!(g, set_g, "g", f64);
+    get_set_jsvalue!(b, set_b, "b", f64);
+    get_set_jsvalue!(a, set_a, "a", f64);
 }
 
 impl From<Color3> for Color4 {
