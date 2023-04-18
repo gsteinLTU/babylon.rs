@@ -35,9 +35,10 @@ jobs:
         shell: bash
         run: |
           cd examples
-          echo "$(ls -d */ | jq -R -s -c 'split("\n")[:-1]')"
-          echo "::set-output name=folders::$(ls -d */ | jq -R -s -c 'split("\n")[:-1]')"
-  
+          #echo "$(ls -d */ | jq -R -s -c 'split("\n")[:-1]')"
+          #echo "::set-output name=folders::$(ls -d */ | jq -R -s -c 'split("\n")[:-1]')"
+          echo "folders=$(ls -d */ | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          
   build-examples:
     name: Build Examples
     runs-on: ubuntu-latest
@@ -49,7 +50,7 @@ jobs:
       - name: wasm-setup
         uses: jetli/wasm-pack-action@v0.4.0
       - name: wasm-pack build
-        working-directory: ${{ matrix.folder }}
+        working-directory: examples/${{ matrix.folder }}
         run: wasm-pack build --target web
   # Single deploy job since we're just deploying
   deploy:
