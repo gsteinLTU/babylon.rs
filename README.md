@@ -68,7 +68,7 @@ pub fn main() {
 }
 ```
 
-See this demo [here](https://richardanaya.github.io/babylon.rs/examples/helloworld/index.html) ( be sure to play with mouse and arrow keys :arrow_left: :arrow_up: :arrow_down: :arrow_right:!)
+See this demo [here](https://gsteinltu.github.io/babylon.rs/examples/helloworld/) ( be sure to play with mouse and arrow keys :arrow_left: :arrow_up: :arrow_down: :arrow_right:!)
 
 # Pong in under 140 Lines
 
@@ -218,12 +218,12 @@ pub fn main() {
 }
 ```
 
-See this demo [here](https://richardanaya.github.io/babylon.rs/examples/pong/index.html) 
+See this demo [here](https://gsteinltu.github.io/babylon.rs/examples/pong/) 
 
 # Other Demos
 
-* [Timer](https://richardanaya.github.io/babylon.rs/examples/timer/index.html)
-* [Keyboard](https://richardanaya.github.io/babylon.rs/examples/keyboard/index.html)
+* [Timer](https://gsteinltu.github.io/babylon.rs/examples/timer/)
+* [Keyboard](https://gsteinltu.github.io/babylon.rs/examples/keyboard/)
 
 # License
 
