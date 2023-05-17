@@ -2,17 +2,16 @@
 
 <a href="https://docs.rs/neo-babylon"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-A WebAssembly wrapper for [Babylon.js](https://www.babylonjs.com/) in Rust. It is a fork of https://github.com/richardanaya/babylon.rs , but using wasm-bindgen and with additional features.
+A WebAssembly wrapper for [Babylon.js](https://www.babylonjs.com/) in Rust. It is largely a fork of https://github.com/richardanaya/babylon.rs, but using wasm-bindgen and with additional features.
 
-This project currently does not provide bindings to all BabylonJS, but this is not by intent.
+This project currently does not provide bindings to all of BabylonJS, but this is not by intent. Please feel free to open issues or pull requests for additional Babylon features.
 
 Current priorities:
-
 * get a basic GLTF up
 * get a camera
 * get some sort of interaction
 
-# Idioms
+Idioms
 * Scenes hold 3D objects
 * Materials determine how a 3D object looks
 * When an 3D object drops it's removed from the scene
