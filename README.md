@@ -19,7 +19,7 @@ Idioms
 # HelloWorld
 
 <p align="center">
-  <img src="images/demo_0.png">
+  <img src="https://raw.githubusercontent.com/gsteinLTU/babylon.rs/master/images/demo_0.png" alt="simple example program showing multiple spheres">
 </p>
 
 ```rust
@@ -72,7 +72,7 @@ See this demo [here](https://gsteinltu.github.io/babylon.rs/examples/helloworld/
 # Pong in under 140 Lines
 
 <p align="center">
-  <img src="images/demo_2.png">
+  <img src="https://raw.githubusercontent.com/gsteinLTU/babylon.rs/master/images/demo_2.png">
 </p>
 
 
