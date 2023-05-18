@@ -1,6 +1,7 @@
 # neo-babylon
 
 <a href="https://docs.rs/neo-babylon"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
+![Crates.io](https://img.shields.io/crates/v/neo-babylon)
 
 A WebAssembly wrapper for [Babylon.js](https://www.babylonjs.com/) in Rust. It is largely a fork of https://github.com/richardanaya/babylon.rs, but using wasm-bindgen and with additional features.
 
