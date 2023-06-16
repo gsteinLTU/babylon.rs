@@ -94,4 +94,33 @@ impl UniversalCamera {
     get_set_jsvalue!(get_max_z, set_max_z, "maxZ", f64);
     get_set_jsvalue!(get_fov, set_fov, "fov", f64);
     get_set_jsvalue!(get_speed, set_speed, "speed", f64);
+    get_set_jsvalue!(get_camera_rotation, set_camera_rotation, "cameraRotation", Vector3);
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(extends = Camera)]
+    pub type FollowCamera;
+
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(
+        name: &str,
+        position: Vector3,
+        scene: Option<&Scene>
+    ) -> FollowCamera;
+
+    /// Attach the camera to the given canvas, necessary for user to manipulate the camera
+    #[wasm_bindgen(method)]
+    pub fn attachControl(this: &FollowCamera, canvas: Element, noPreventDefault: bool);
+}
+
+impl FollowCamera {
+    get_set_jsvalue!(get_min_z, set_min_z, "minZ", f64);
+    get_set_jsvalue!(get_max_z, set_max_z, "maxZ", f64);
+    get_set_jsvalue!(get_fov, set_fov, "fov", f64);
+    get_set_jsvalue!(get_radius, set_radius, "radius", f64);
+    get_set_jsvalue!(get_height_offset, set_height_offset, "heightOffset", f64);
+    get_set_jsvalue!(get_rotation_offset, set_rotation_offset, "rotationOffset", f64);
+    get_set_jsvalue!(get_camera_acceleration, set_camera_acceleration, "cameraAcceleration", f64);
+    get_set_jsvalue!(get_max_camera_speed, set_max_camera_speed, "maxCameraSpeed", f64);
 }
