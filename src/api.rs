@@ -4,6 +4,7 @@ use wasm_bindgen::{
     prelude::Closure,
     JsCast,
 };
+use web_sys::window;
 
 use crate::prelude::*;
 
@@ -16,12 +17,7 @@ extern "C" {
 /// 
 /// The scene will have an ArcRotateCamera, a HemisphericLight, and a PointLight.
 pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
-    let window = web_sys::window().expect("should have a window in this context");
-    let document = window.document().expect("window should have a document");
-    let canvas = document
-        .query_selector(selector)
-        .expect("Selector not found")
-        .expect("Selector not found");
+    let canvas = get_element(selector);
 
     let scene = create_scene(selector);
 
@@ -46,12 +42,8 @@ pub fn create_basic_scene(selector: &str) -> Rc<RefCell<Scene>> {
 
 /// Create a barebones Scene in the canvas referred to by the selector.
 pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
-    let window = web_sys::window().expect("should have a window in this context");
-    let document = window.document().expect("window should have a document");
-    let canvas = document
-        .query_selector(selector)
-        .expect("Selector not found")
-        .expect("Selector not found");
+    let window = window().expect("should have a window in this context");
+    let canvas = get_element(selector);
 
     let engine = Rc::new(RefCell::new(Engine::new(&canvas, true)));
 
@@ -71,5 +63,15 @@ pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
     window.set_onresize(Some(resize_closure.into_js_value().unchecked_ref()));
 
     scene
+}
+
+pub fn get_element(selector: &str) -> web_sys::Element {
+    let window = web_sys::window().expect("should have a window in this context");
+    let document = window.document().expect("window should have a document");
+    let e = document
+        .query_selector(selector)
+        .expect("Selector not found")
+        .expect("Selector not found");
+    e
 }
 

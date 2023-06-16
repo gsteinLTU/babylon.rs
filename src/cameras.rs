@@ -51,3 +51,47 @@ impl Default for ArcRotateCamera {
         )
     }
 }
+
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(extends = Camera)]
+    pub type UniversalCamera;
+
+    #[wasm_bindgen(constructor, js_namespace = BABYLON)]
+    pub fn new(
+        name: &str,
+        position: Vector3,
+        scene: Option<&Scene>
+    ) -> UniversalCamera;
+
+    /// Attach the camera to the given canvas, necessary for user to manipulate the camera
+    #[wasm_bindgen(method)]
+    pub fn attachControl(this: &UniversalCamera, canvas: Element, noPreventDefault: bool);
+
+    #[wasm_bindgen(method, getter)]
+    pub(crate) fn position(this: &UniversalCamera) -> Vector3;
+
+    #[wasm_bindgen(method, setter)]
+    pub(crate) fn set_position(this: &UniversalCamera, newPosition: &Vector3);
+
+    #[wasm_bindgen(method, getter)]
+    pub(crate) fn rotation(this: &UniversalCamera) -> Vector3;
+
+    #[wasm_bindgen(method, setter)]
+    pub(crate) fn set_rotation(this: &UniversalCamera, newRotation: &Vector3);
+
+    #[wasm_bindgen(method, getter)]
+    pub(crate) fn rotationQuaternion(this: &UniversalCamera) -> Quaternion;
+
+    #[wasm_bindgen(method, setter)]
+    pub(crate) fn set_rotationQuaternion(this: &UniversalCamera, quaternion: Option<&Quaternion>);
+
+}
+
+impl UniversalCamera {
+    get_set_jsvalue!(get_min_z, set_min_z, "minZ", f64);
+    get_set_jsvalue!(get_max_z, set_max_z, "maxZ", f64);
+    get_set_jsvalue!(get_fov, set_fov, "fov", f64);
+    get_set_jsvalue!(get_speed, set_speed, "speed", f64);
+}

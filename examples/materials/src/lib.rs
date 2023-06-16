@@ -11,8 +11,23 @@ struct Game {
 
 impl Game {
     fn new() -> Self {
+        let scene = api::create_scene("#renderCanvas");
+
+        // Add a camera to the scene and attach it to the canvas
+        let camera = UniversalCamera::new(
+            "Camera",
+            Vector3::new(0.0, 0.0, -5.0),
+            Some(&scene.borrow())
+        );
+
+        camera.attachControl(get_element("#renderCanvas"), true);
+    
+        // Add lights to the scene
+        HemisphericLight::new("light1", Vector3::new(1.0, 1.0, 0.0), &scene.borrow());
+        PointLight::new("light2", Vector3::new(0.0, 1.0, -1.0), &scene.borrow());
+
         Game {
-            scene: api::create_basic_scene("#renderCanvas"),
+            scene,
             shapes: vec![],
         }
     }
