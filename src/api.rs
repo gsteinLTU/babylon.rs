@@ -65,6 +65,12 @@ pub fn create_scene(selector: &str) -> Rc<RefCell<Scene>> {
     scene
 }
 
+pub fn setup_vr_experience(scene: &Scene) {
+    if Reflect::has(&window().unwrap().navigator().unchecked_into() as &JsValue, &"xr".into()).unwrap_or(false) {
+        scene.createDefaultVRExperience();
+    }
+}
+
 pub fn get_element(selector: &str) -> web_sys::Element {
     let window = web_sys::window().expect("should have a window in this context");
     let document = window.document().expect("window should have a document");

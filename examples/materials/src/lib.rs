@@ -26,6 +26,8 @@ impl Game {
         HemisphericLight::new("light1", Vector3::new(1.0, 1.0, 0.0), &scene.borrow());
         PointLight::new("light2", Vector3::new(0.0, 1.0, -1.0), &scene.borrow());
 
+        api::setup_vr_experience(&scene.borrow());
+
         Game {
             scene,
             shapes: vec![],

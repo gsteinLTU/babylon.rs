@@ -21,6 +21,7 @@ extern "C" {
 
 impl HemisphericLight {
     get_set_jsvalue!(get_direction, set_direction, "direction", Vector3);
+    get_set_jsvalue!(get_intensity, set_intensity, "intensity", f64);
 }
 
 #[wasm_bindgen]
@@ -30,4 +31,8 @@ extern "C" {
     
     #[wasm_bindgen(constructor, js_namespace = BABYLON)]
     pub fn new(name: &str, position: Vector3, scene: &Scene) -> PointLight;
+}
+
+impl PointLight {
+    get_set_jsvalue!(get_intensity, set_intensity, "intensity", f64);
 }

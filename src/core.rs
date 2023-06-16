@@ -36,6 +36,9 @@ extern "C" {
 
     #[wasm_bindgen(method)]
     pub fn getEngine(this: &Scene) -> Engine;
+
+    #[wasm_bindgen(method)]
+    pub fn createDefaultVRExperience(this: &Scene);
 }
 
 
