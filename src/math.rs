@@ -40,9 +40,10 @@ extern "C" {
     pub fn set_z(this: &Vector3, value: f64);
 }
 
-impl From<(f64, f64, f64)> for Vector3 {
-    fn from(value: (f64, f64, f64)) -> Self {
-        Vector3::new(value.0, value.1, value.2)
+impl<T> From<(T, T, T)> for Vector3 
+where T: Into<f64> + Copy {
+    fn from(value: (T, T, T)) -> Self {
+        Vector3::new(value.0.into(), value.1.into(), value.2.into())
     }
 }
 
@@ -137,6 +138,13 @@ impl Color4 {
 impl From<Color3> for Color4 {
     fn from(value: Color3) -> Self {
         Color4::new(value.r().into(), value.g().into(), value.b().into(), 1.0)
+    }
+}
+
+impl<T> From<(T, T, T, T)> for Vector4
+where T: Into<f64> + Copy {
+    fn from(value: (T, T, T, T)) -> Self {
+        Vector4::new(value.0.into(), value.1.into(), value.2.into(), value.3.into())
     }
 }
 
