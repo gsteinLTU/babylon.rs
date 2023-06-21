@@ -119,6 +119,13 @@ impl Color3 {
     get_set_jsvalue!(b, set_b, "b", f64);
 }
 
+impl<T> From<(T, T, T)> for Color3 
+where T: Into<f64> + Copy {
+    fn from(value: (T, T, T)) -> Self {
+        Color3::new(value.0.into(), value.1.into(), value.2.into())
+    }
+}
+
 #[wasm_bindgen]
 extern "C" {
     /// An RGBA color
@@ -138,6 +145,13 @@ impl Color4 {
 impl From<Color3> for Color4 {
     fn from(value: Color3) -> Self {
         Color4::new(value.r().into(), value.g().into(), value.b().into(), 1.0)
+    }
+}
+
+impl<T> From<(T, T, T, T)> for Color4
+where T: Into<f64> + Copy {
+    fn from(value: (T, T, T, T)) -> Self {
+        Color4::new(value.0.into(), value.1.into(), value.2.into(), value.3.into())
     }
 }
 
