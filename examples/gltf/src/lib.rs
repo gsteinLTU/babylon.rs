@@ -35,15 +35,7 @@ impl Game {
         let sun = DirectionalLight::new("light", Vector3::new(-0.25, -1.0, 0.0), &scene.borrow());
         HemisphericLight::new("light1", Vector3::new(1.0, 1.0, 0.0), &scene.borrow());
 
-        let shadow_generator = CascadedShadowGenerator::new(1024.0, &sun);
-        shadow_generator.set_bias(0.007);
-        shadow_generator.set_cascade_blend_percentage(0.15);
-        shadow_generator.set_lambda(0.9);
-        shadow_generator.set_stabilize_cascades(true);
-        shadow_generator.set_filtering_quality(1.0);
-        shadow_generator.set_filter(6.0);
-        shadow_generator.set_frustum_edge_falloff(1.0);
-        shadow_generator.set_shadow_max_z(50.0);
+        let shadow_generator = CascadedShadowGenerator::new(2048.0, &sun);
 
         Game {
             scene,
