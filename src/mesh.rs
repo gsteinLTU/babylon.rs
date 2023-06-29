@@ -53,6 +53,10 @@ impl Mesh {
     pub(crate) fn set_scaling(&self, newScaling: &Vector3){
         Reflect::set(&self, &JsValue::from_str("scaling"), &newScaling).unwrap();
     }
+
+    pub(crate) fn set_receive_shadows(&self, receive_shadows: bool){
+        Reflect::set(&self, &JsValue::from_str("receiveShadows"), &JsValue::from_bool(receive_shadows)).unwrap();
+    }
 }
 
 
@@ -117,6 +121,10 @@ impl BabylonMesh {
     
     pub fn set_material(&self, material: &Material) {
         self.mesh.set_material(material);
+    }
+
+    pub fn set_receive_shadows(&self, receive_shadows: bool) {
+        self.mesh.set_receive_shadows(receive_shadows);
     }
 }
 

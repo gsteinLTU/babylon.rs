@@ -70,23 +70,22 @@ extern "C" {
     pub fn attachControl(this: &UniversalCamera, canvas: Element, noPreventDefault: bool);
 
     #[wasm_bindgen(method, getter)]
-    pub(crate) fn position(this: &UniversalCamera) -> Vector3;
+    pub fn position(this: &UniversalCamera) -> Vector3;
 
     #[wasm_bindgen(method, setter)]
-    pub(crate) fn set_position(this: &UniversalCamera, newPosition: &Vector3);
+    pub fn set_position(this: &UniversalCamera, newPosition: &Vector3);
 
     #[wasm_bindgen(method, getter)]
-    pub(crate) fn rotation(this: &UniversalCamera) -> Vector3;
+    pub fn rotation(this: &UniversalCamera) -> Vector3;
 
     #[wasm_bindgen(method, setter)]
-    pub(crate) fn set_rotation(this: &UniversalCamera, newRotation: &Vector3);
+    pub fn set_rotation(this: &UniversalCamera, newRotation: &Vector3);
 
     #[wasm_bindgen(method, getter)]
-    pub(crate) fn rotationQuaternion(this: &UniversalCamera) -> Quaternion;
+    pub fn rotationQuaternion(this: &UniversalCamera) -> Quaternion;
 
     #[wasm_bindgen(method, setter)]
-    pub(crate) fn set_rotationQuaternion(this: &UniversalCamera, quaternion: Option<&Quaternion>);
-
+    pub fn set_rotationQuaternion(this: &UniversalCamera, quaternion: Option<&Quaternion>);
 }
 
 impl UniversalCamera {

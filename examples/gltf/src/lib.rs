@@ -1,6 +1,6 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc, f64::consts::PI};
 
-use neo_babylon::{api, prelude::*};
+use neo_babylon::prelude::*;
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 #[wasm_bindgen]
@@ -11,13 +11,44 @@ pub fn init_panic_hook() {
 struct Game {
     scene: Rc<RefCell<Scene>>,
     models: RefCell<Vec<Rc<BabylonMesh>>>,
+    shadow_generator: Rc<CascadedShadowGenerator>,
 }
 
 impl Game {
     fn new() -> Self {
+        let scene = neo_babylon::api::create_scene("#renderCanvas");
+        
+        // Add a camera to the scene and attach it to the canvas
+        let camera = UniversalCamera::new(
+            "Camera",
+            Vector3::new(0.0, 1.0, 5.0),
+            Some(&scene.borrow())
+        );
+        camera.set_rotation(&Vector3::new(0.0, PI, 0.0));
+        camera.attachControl(neo_babylon::api::get_element("#renderCanvas"), true);
+        camera.set_min_z(0.01);
+        camera.set_max_z(300.0);
+        camera.set_speed(0.35);
+
+        // For the current version, lights are added here, later they will be requested as part of scenario to allow for other lighting conditions
+        // Add lights to the scene
+        let sun = DirectionalLight::new("light", Vector3::new(-0.25, -1.0, 0.0), &scene.borrow());
+        HemisphericLight::new("light1", Vector3::new(1.0, 1.0, 0.0), &scene.borrow());
+
+        let shadow_generator = CascadedShadowGenerator::new(1024.0, &sun);
+        shadow_generator.set_bias(0.007);
+        shadow_generator.set_cascade_blend_percentage(0.15);
+        shadow_generator.set_lambda(0.9);
+        shadow_generator.set_stabilize_cascades(true);
+        shadow_generator.set_filtering_quality(1.0);
+        shadow_generator.set_filter(6.0);
+        shadow_generator.set_frustum_edge_falloff(1.0);
+        shadow_generator.set_shadow_max_z(50.0);
+
         Game {
-            scene: api::create_basic_scene("#renderCanvas"),
+            scene,
             models: RefCell::new(vec![]),
+            shadow_generator: Rc::new(shadow_generator),
         }
     }
 
@@ -39,6 +70,14 @@ thread_local! {
 pub fn main() {
     init_panic_hook();
 
+    GAME.with(|game| {
+        // Create ground to show shadows on
+        let box_model = Rc::new(BabylonMesh::create_box(&game.borrow().scene.borrow(), "ground", BoxOptions { depth: Some(10.0), height: Some(0.05), width: Some(10.0), ..Default::default() }));
+        box_model.set_position_y(-1.0);
+        box_model.set_receive_shadows(true);
+        game.borrow().models.borrow_mut().push(box_model);
+    });
+
     wasm_bindgen_futures::spawn_local(GAME.with(|game| {
         let game_rc = Rc::clone(&game);
         async move {
@@ -47,9 +86,10 @@ pub fn main() {
             .load_model("boombox", "BoomBox.gltf")
                 .await
                 .unwrap();
-            
             // Example model has odd scaling
             gltf.set_scaling(&(-50.0, 50.0, 50.0).into());            
+
+            game_rc.borrow().shadow_generator.add_shadow_caster(&gltf, true);
         }
     }));
 
@@ -65,6 +105,8 @@ pub fn main() {
 
             gltf.set_scaling(&(-70.0, 70.0, 70.0).into());
             gltf.set_position_x(2.0);
+
+            game_rc.borrow().shadow_generator.add_shadow_caster(&gltf, true);
         }
     }));
 }

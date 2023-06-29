@@ -7,7 +7,16 @@ macro_rules! get_set_jsvalue {
         }
     
         pub fn $setter_name(&self, val: f64) {
-            Reflect::set(&self, &JsValue::from_str($jsprop), &JsValue::from(val)).expect(&format!("{} not found", $jsprop));
+            Reflect::set(&self, &JsValue::from_str($jsprop), &JsValue::from_f64(val)).expect(&format!("{} not found", $jsprop));
+        }
+    };
+    ($getter_name:ident, $setter_name:ident, $jsprop:expr, bool) => {
+        pub fn $getter_name(&self) -> bool {
+            Reflect::get(&self, &JsValue::from_str($jsprop)).expect(&format!("{} not found", $jsprop)).as_bool().unwrap()
+        }
+    
+        pub fn $setter_name(&self, val: bool) {
+            Reflect::set(&self, &JsValue::from_str($jsprop), &JsValue::from_bool(val)).expect(&format!("{} not found", $jsprop));
         }
     };
     ($getter_name:ident, $setter_name:ident, $jsprop:expr, $type:ty) => {
