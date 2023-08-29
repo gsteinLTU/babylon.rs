@@ -133,3 +133,9 @@ impl Drop for BabylonMesh {
         self.mesh.dispose(None, None);
     }
 }
+
+impl AsRef<JsValue> for BabylonMesh {
+    fn as_ref(&self) -> &JsValue {
+        self.mesh.unchecked_ref()
+    }
+}
