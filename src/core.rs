@@ -2,7 +2,7 @@ use js_sys::{Function, Reflect};
 use wasm_bindgen::{prelude::{wasm_bindgen, Closure}, JsValue, JsCast, closure::WasmClosure};
 use web_sys::{Element};
 
-use crate::prelude::{Color4};
+use crate::{prelude::{Color4, Camera}, get_set_jsvalue};
 
 #[wasm_bindgen]
 extern "C" {
@@ -73,4 +73,6 @@ impl Scene {
     pub fn add_before_render_observable(&self,  cb: Closure<dyn FnMut()>) {
         self.add_observable("onBeforeRenderObservable", cb);
     }
+
+    get_set_jsvalue!(get_active_camera, set_active_camera, "activeCamera", Camera);
 }

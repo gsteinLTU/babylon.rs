@@ -122,4 +122,5 @@ impl FollowCamera {
     get_set_jsvalue!(get_rotation_offset, set_rotation_offset, "rotationOffset", f64);
     get_set_jsvalue!(get_camera_acceleration, set_camera_acceleration, "cameraAcceleration", f64);
     get_set_jsvalue!(get_max_camera_speed, set_max_camera_speed, "maxCameraSpeed", f64);
+    get_set_jsvalue!(get_locked_target, set_locked_target, "lockedTarget", Option<JsValue>);
 }
