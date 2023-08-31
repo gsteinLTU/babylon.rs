@@ -134,6 +134,12 @@ impl Drop for BabylonMesh {
     }
 }
 
+impl Into<JsValue> for BabylonMesh {
+    fn into(self) -> JsValue {
+        self.mesh.clone().unchecked_into()
+    }
+}
+
 impl AsRef<JsValue> for BabylonMesh {
     fn as_ref(&self) -> &JsValue {
         self.mesh.unchecked_ref()
