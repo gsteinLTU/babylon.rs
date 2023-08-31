@@ -126,17 +126,15 @@ impl BabylonMesh {
     pub fn set_receive_shadows(&self, receive_shadows: bool) {
         self.mesh.set_receive_shadows(receive_shadows);
     }
+
+    pub fn get_mesh_as_js_value(&self) -> JsValue {
+        self.mesh.clone().into()
+    }
 }
 
 impl Drop for BabylonMesh {
     fn drop(&mut self) {
         self.mesh.dispose(None, None);
-    }
-}
-
-impl Into<JsValue> for BabylonMesh {
-    fn into(self) -> JsValue {
-        self.mesh.clone().unchecked_into()
     }
 }
 
