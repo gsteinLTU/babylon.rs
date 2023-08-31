@@ -74,5 +74,7 @@ impl Scene {
         self.add_observable("onBeforeRenderObservable", cb);
     }
 
-    get_set_jsvalue!(get_active_camera, set_active_camera, "activeCamera", Camera);
+    pub fn set_active_camera(&self,val: &Camera){
+        Reflect::set(&self, &JsValue::from_str("activeCamera"), &val).expect(&format!("{} not found","activeCamera"));
+    }
 }
