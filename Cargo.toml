@@ -1,6 +1,6 @@
 [package]
 name = "neo-babylon"
-version = "0.1.12"
+version = "0.1.13"
 authors = ["Gordon Stein"]
 edition = "2021"
 description = "A wasm-bindgen-based wrapper for Babylon.js"

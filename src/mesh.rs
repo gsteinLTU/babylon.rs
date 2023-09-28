@@ -42,6 +42,10 @@ impl Mesh {
         Reflect::set(&self, &JsValue::from_str("material"), &material).unwrap();
     }
 
+    pub(crate) fn get_material(&self, material: &Material){
+        Reflect::get(&self, &JsValue::from_str("material")).unwrap();
+    }
+
     pub(crate) fn set_parent(&self, parent: &Mesh){
         Reflect::set(&self, &JsValue::from_str("parent"), &parent).unwrap();
     }

@@ -1,8 +1,8 @@
 use js_sys::{Function, Reflect};
 use wasm_bindgen::{prelude::{wasm_bindgen, Closure}, JsValue, JsCast, closure::WasmClosure};
-use web_sys::{Element};
+use web_sys::Element;
 
-use crate::{prelude::{Color4, Camera}, get_set_jsvalue};
+use crate::prelude::{Color4, Camera};
 
 #[wasm_bindgen]
 extern "C" {

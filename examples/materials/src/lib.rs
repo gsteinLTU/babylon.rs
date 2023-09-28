@@ -67,6 +67,13 @@ pub fn main() {
             // Create material with random color
             let mat =
                 StandardMaterial::new(format!("mat_{}", i).as_str(), &game.borrow().scene.borrow());
+            
+            if Math::random() > 0.5 {
+                let tex = Texture::new("grid.png");
+                tex.set_u_scale(Math::round((Math::random() + 0.5) * 10.0));
+                tex.set_v_scale(tex.get_u_scale());
+                mat.set_diffuse_texture(tex);
+            }
             mat.set_diffuse_color(Color3::new(Math::random(), Math::random(), Math::random()));
             mat.set_alpha(Math::random());
             cube.set_material(&mat);
