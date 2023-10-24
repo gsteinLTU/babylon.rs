@@ -45,7 +45,7 @@ impl Game {
     }
 
     async fn load_model(&self, name: &str, url: &str) -> Result<Rc<BabylonMesh>, JsValue> {
-        let model = BabylonMesh::create_gltf(&self.scene.borrow(), name, url).await;
+        let model = BabylonMesh::create_gltf(&self.scene.borrow(), name, url).await.expect("Failed to load model");
 
         let model = Rc::new(model);
         self.models.borrow_mut().push(model.clone());

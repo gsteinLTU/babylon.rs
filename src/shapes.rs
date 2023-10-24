@@ -61,14 +61,14 @@ impl BabylonMesh {
         }
     }
 
-    pub async fn create_gltf(scene: &Scene, name: &str, file: &str) -> BabylonMesh {
+    pub async fn create_gltf(scene: &Scene, name: &str, file: &str) -> Result<BabylonMesh, JsValue> {
         let dummy = Mesh::new(name, scene.into());
         let promise = SceneLoader::ImportMeshAsync(None, "", file, scene.into());
         let import = wasm_bindgen_futures::JsFuture::from(promise);
 
-        let import_result = import.await.expect("Error reading GLTF file");
+        let import_result = import.await?;
 
-        let imported_meshes = &Reflect::get(&import_result, &JsValue::from_str("meshes")).expect("Error reading GLTF file");
+        let imported_meshes = &Reflect::get(&import_result, &JsValue::from_str("meshes"))?;
         let imported_meshes_array = imported_meshes.unchecked_ref::<Array>();
 
         for val in imported_meshes_array.iter() { 
@@ -76,8 +76,8 @@ impl BabylonMesh {
             mesh.set_parent(&dummy);
         }
 
-        BabylonMesh {
+        Ok(BabylonMesh {
             mesh: dummy,
-        }
+        })
     }
 }
